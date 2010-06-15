@@ -18,9 +18,9 @@ int main (int argc, char **argv){
   char mstate_file[100], rstate_file[100], nstate_file[100], sstate_file[100], pstate_file[100];
   char s1state_file[100], p1state_file[100], dstate_file[100], prob_indel[100], prob_noindel[100];
   FILE *fp_out, *fp_aa, *fp_dna, *fp;
-  char train_dir[100]="";
+  char train_dir[100] = "";
   int count=0;
-  char mystring[1000]="";
+  char mystring[1000] = "";
   int *obs_seq_len;
 
 

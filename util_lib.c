@@ -238,7 +238,7 @@ int trinucleotide_pep (char a, char b, char c){
 
 void get_rc_dna(char *dna, char *dna1){
 
-  char codon[4] = {'A', 'C', 'G', 'T'};
+  char codon[5] = {'A', 'C', 'G', 'T', 'N'};
   int i;
   int dna_len = strlen(dna);
   for (i=0; i<dna_len; i++){
@@ -319,6 +319,7 @@ void print_usage(){
   printf("%s", "                           [complete] for complete genomic sequences or short sequence reads without sequencing error\n");
   printf("%s", "                           [sanger_5] for Sanger sequencing reads with about 0.5% error rate\n");
   printf("%s", "                           [sanger_10] for Sanger sequencing reads with about 1% error rate\n");
+  printf("%s", "                           [454_5] for 454 pyrosequencing reads with about 0.5% error rate\n");
   printf("%s", "                           [454_10] for 454 pyrosequencing reads with about 1% error rate\n");
   printf("%s", "                           [454_30] for 454 pyrosequencing reads with about 3% error rate\n");
   printf("%s", "                           [illumina_5] for Illumina sequencing reads with about 0.5% error rate\n");
