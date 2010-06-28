@@ -40,9 +40,9 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   double h_kd, r_kd, p_kd;
 
   int codon_start;
-  char dna[30000];
-  char dna1[30000];
-  char protein[10000];
+  char dna[300000];
+  char dna1[300000];
+  char protein[100000];
   int dna_id=0;
   int out_nt;
   int start_t;
@@ -688,10 +688,12 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 /*     printf("\n\n"); */
 
   }
-  
+
+ 
   /***********************************************************/
   /* backtrack array to find the optimal path                */
   /***********************************************************/
+
   fprintf(fp_out, "%s\n", head);
   head_short = strtok(head, delimi);
 
@@ -702,6 +704,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
     if (alpha[i][len_seq-1] < prob){
       prob = alpha[i][len_seq-1];
       vpath[len_seq-1] = i;
+/*       printf("%lf, %d\n", prob, vpath[len_seq-1]); */
     }
   }
 
@@ -715,7 +718,8 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   codon_start=0;
   start_t=-1;
 
-  for (t=0; t<len_seq; t++){
+
+  for (t=0; t<len_seq; t++){  
 
     if (codon_start==0 && start_t < 0 &&
 	((vpath[t]>=M1_STATE && vpath[t]<=M6_STATE) || 
@@ -728,9 +732,9 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	(vpath[t]==M1_STATE || vpath[t]==M4_STATE || 
 	 vpath[t]==M1_STATE_1 || vpath[t]==M4_STATE_1)){
  
-      memset(dna,0,30000);
-      memset(dna1,0,30000);
-      memset(protein,0, 10000);
+      memset(dna,0,300000);
+      memset(dna1,0,300000);
+      memset(protein,0, 100000);
       memset(insert,0,100);
       memset(delete,0,100);
 
@@ -765,6 +769,8 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	if (codon_start==1){
 	  
 	  fprintf(fp_out, "%d\t%d\t+\t%d\t%lf\t", start_t, end_t, frame, final_score);
+/* 	  printf("mina %d\t%d\t+\t%d\t%lf\t", start_t, end_t, frame, final_score); */
+
 	  fprintf(fp_out, "I:");
 	  for (i=0; i<insert_id; i++){
 	    fprintf(fp_out, "%d,", insert[i]);
@@ -785,6 +791,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	}else if (codon_start==-1){
 	  
 	  fprintf(fp_out, "%d\t%d\t-\t%d\t%lf\t", start_t, end_t, frame, final_score);
+/* 	  printf("mina %d\t%d\t-\t%d\t%lf\t", start_t, end_t, frame, final_score); */
 	  fprintf(fp_out, "I:");
 	  for (i=0; i<insert_id; i++){
 	    fprintf(fp_out, "%d,", insert[i]);

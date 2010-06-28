@@ -173,14 +173,20 @@ int main (int argc, char **argv){
 
   count=-1;
   rewind(fp);
+
   while ( fgets (mystring , sizeof mystring  , fp) ){
+
     if (mystring[0] == '>'){
+
       if (count>=0){
-	get_prob_from_cg(&hmm, &train, obs_seq);
-	if (strlen(obs_seq)>70){
+
+ 	get_prob_from_cg(&hmm, &train, obs_seq);
+
+ 	if (strlen(obs_seq)>70){
 	  viterbi(&hmm, obs_seq, fp_out, fp_aa, fp_dna, obs_head, wholegenome);
 	}
       }
+
       obs_head = (char *)malloc(strlen(mystring) * sizeof(char));
       memset(obs_head, 0, strlen(mystring) * sizeof(char));
       memcpy(obs_head, mystring, strlen(mystring)-1);
@@ -197,8 +203,11 @@ int main (int argc, char **argv){
   }
 
   if (count>=0){
+
     get_prob_from_cg(&hmm, &train, obs_seq);
+
     if (strlen(obs_seq)>70){
+      printf("%d\n", strlen(obs_seq));
       viterbi(&hmm, obs_seq, fp_out, fp_aa, fp_dna, obs_head, wholegenome);
     }
   }
