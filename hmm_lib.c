@@ -482,7 +482,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	alpha[M1_STATE][t] = max_dbl;
 
 	if (O[t+1] == 'A' && O[t+2] == 'A' ){
-	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(0.53);
+	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(0.54);
 	}else if (O[t+1] == 'A' && O[t+2] == 'G' ){
 	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(0.16);
 	}else if(O[t+1] == 'G' && O[t+2] == 'A' ){
@@ -507,9 +507,10 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       }      
     }
 
-    /*************************/
-    /* START' state          */
-    /************************/
+    /*************************************************/
+    /* START' state                                  */
+    /* origianlly stop codon of genes in - strand    */
+    /*************************************************/
     if (alpha[S_STATE_1][t] == 0){
       
       alpha[S_STATE_1][t] = max_dbl;  
@@ -533,7 +534,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	  path[S_STATE_1][t] = E_STATE_1;
 	}
 
-	temp_alpha = alpha[E_STATE][t-1] - log(hmm_ptr->tr[TR_ES]);
+	temp_alpha = alpha[E_STATE][t-1] - log(hmm_ptr->tr[TR_ES1]);
 	if (temp_alpha < alpha[S_STATE_1][t+2]){
 	  alpha[S_STATE_1][t+2] = temp_alpha;
 	  path[S_STATE_1][t] = E_STATE;
@@ -543,7 +544,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
         alpha[M6_STATE_1][t+2] = max_dbl;
 
 	if (O[t] == 'T' && O[t+1] == 'T'  ){
-	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(0.53);
+	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(0.54);
 	}else if (O[t] == 'C' && O[t+1] == 'T'  ){
 	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(0.16);
 	}else if(O[t] == 'T' && O[t+1] == 'C' ){
@@ -592,7 +593,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	  path[S_STATE][t] = E_STATE;
 	}
 
-	temp_alpha = alpha[E_STATE_1][t-1] - log(hmm_ptr->tr[TR_ES]);
+	temp_alpha = alpha[E_STATE_1][t-1] - log(hmm_ptr->tr[TR_ES1]);
 	if (temp_alpha < alpha[S_STATE][t+2]){
 	  alpha[S_STATE][t+2] = temp_alpha;
 	  path[S_STATE][t] = E_STATE_1;
@@ -600,7 +601,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 
 	
 	if (O[t] == 'A' ){
-	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(0.82);
+	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(0.83);
 	}else if (O[t] == 'G'){
 	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(0.10);
 	}else if(O[t] == 'T') {
@@ -626,9 +627,10 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       }
     }
 
-    /******************/
-    /* END' state      */ 
-    /******************/
+    /**********************************************/
+    /* END' state                                 */ 
+    /* origianlly start codon of genes in - strand */
+    /**********************************************/
     if (alpha[E_STATE_1][t] == 0){
 
       alpha[E_STATE_1][t] = max_dbl;  
@@ -646,7 +648,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	path[E_STATE_1][t+2] = E_STATE_1;
 	
 	if (O[t+2] == 'T' ){
-	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(0.82);
+	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(0.83);
 	}else if (O[t+2] == 'C' ){
 	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(0.10);
 	}else if(O[t+2] == 'A' ){
@@ -689,13 +691,13 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 
   }
 
- 
   /***********************************************************/
   /* backtrack array to find the optimal path                */
   /***********************************************************/
 
   fprintf(fp_out, "%s\n", head);
   head_short = strtok(head, delimi);
+
 
   /* find the state for O[N] with the highest probability */
   prob = max_dbl;
@@ -711,7 +713,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   /* backtrack the opitmal path */
   for(t=len_seq-2; t>=0; t--){
     vpath[t] = path[vpath[t+1]][t+1];
-/*     printf("%d %d\n",t, vpath[t]); */
+/*     printf("%d %d %c  \n",t, vpath[t], O[t]); */
   }
 
   print_save = 0;
@@ -915,7 +917,7 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mf
 
   /* Transition */
   fscanf(fp, "%s", head);
-  for (i=0; i<13; i++){
+  for (i=0; i<14; i++){
     fscanf(fp, "%s %lf", name, &prob);
     hmm_ptr->tr[tr2int(name)] = prob;
   }
@@ -1084,66 +1086,6 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mf
   }
   fclose(fpd);
   
-}
-
-
-void read_obs_seq_from_file(char *filename, char ***obs_seqs_ptr, int *num_seqs_ptr, char ***obs_heads_ptr){
-
-  int i=0, j=0;
-  int count=0;
-  char mystring[1000];
-
-  FILE *fp = fopen (filename , "r");
-
-  /* count number of seq */
-  while ( fgets (mystring , sizeof mystring , fp) ){
-    if (mystring[0] == '>'){
-      count++;
-    }
-  }
-  *num_seqs_ptr = count;    
-  *obs_seqs_ptr = (char **)malloc(*num_seqs_ptr * sizeof(char*));
-  *obs_heads_ptr = (char **)malloc(*num_seqs_ptr * sizeof(char*));
-
-  /* allocate memory */
-  char **obs_seqs = *obs_seqs_ptr;
-  char **obs_heads = *obs_heads_ptr;
-  count=0;
-  rewind(fp);
-  while ( fgets (mystring , sizeof mystring , fp) ){
-    
-    if (mystring[0] == '>'){
-      /* seq */
-      if (i>0){
-	obs_seqs[count] = (char *)malloc(i * sizeof(char) + 1);
-        memset(obs_seqs[count], 0, i * sizeof(char) + 1);
-	count++;
-      }
-      /* head */
-      obs_heads[count] = (char *)malloc(strlen(mystring) * sizeof(char));
-      memset(obs_heads[count], 0, strlen(mystring) * sizeof(char));
-      memcpy(obs_heads[count], mystring, strlen(mystring)-1);
-      i = 0;
-    }else{
-      i += (strlen(mystring)-1);
-    }
-  }
-  obs_seqs[count] = (char *)malloc(i * sizeof(char) + 1);
-  memset(obs_seqs[count], 0, i * sizeof(char) + 1);
-
-  /* read sequence */
-  count=-1;
-  rewind(fp);
-  while ( fgets (mystring , sizeof mystring  , fp) ){
-    if (mystring[0] == '>'){
-      count++;
-      j=0;
-    }else{
-      memcpy(obs_seqs[count]+j, mystring, strlen(mystring)-1);
-      j += (strlen(mystring)-1);
-    } 
-  }
-  close(fp);
 }
 
 

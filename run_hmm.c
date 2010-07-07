@@ -14,22 +14,35 @@ int main (int argc, char **argv){
   char *obs_seq, *obs_head;
   TRAIN train;
   int wholegenome;
-  char hmm_file[100], aa_file[100], seq_file[100], out_file[100], dna_file[100], train_file[100];
-  char mstate_file[100], rstate_file[100], nstate_file[100], sstate_file[100], pstate_file[100];
-  char s1state_file[100], p1state_file[100], dstate_file[100], prob_indel[100], prob_noindel[100];
   FILE *fp_out, *fp_aa, *fp_dna, *fp;
+  char hmm_file[100] = "";
+  char aa_file[100] = "";
+  char seq_file[100] = "";
+  char out_file[100] = "";
+  char dna_file[100] = "";
+  char train_file[100] = "";
+  char mstate_file[100] = "";
+  char rstate_file[100] = "";
+  char nstate_file[100] = "";
+  char sstate_file[100] = "";
+  char pstate_file[100] = "";
+  char s1state_file[100] = "";     /* stop codon of gene in - stand */
+  char p1state_file[100] = "";
+  char dstate_file[100] = "";
+  char prob_indel[100] = "";
+  char prob_noindel[100] = "";
   char train_dir[100] = "";
   int count=0;
   char mystring[1000] = "";
   int *obs_seq_len;
-
+  int bp_count;  /* count the length of each line in input file */
 
   strncpy(train_dir, argv[0], strlen(argv[0])-12);
   strcat(train_dir, "train/");
   strcpy(mstate_file, train_dir);
-  strcat(mstate_file, "trans");
+  strcat(mstate_file, "gene");
   strcpy(rstate_file, train_dir);
-  strcat(rstate_file, "rtrans");
+  strcat(rstate_file, "rgene");
   strcpy(nstate_file, train_dir);
   strcat(nstate_file, "noncoding");
   strcpy(sstate_file, train_dir);
@@ -37,9 +50,9 @@ int main (int argc, char **argv){
   strcpy(pstate_file, train_dir);
   strcat(pstate_file, "stop");
   strcpy(s1state_file, train_dir);
-  strcat(s1state_file, "start1");
+  strcat(s1state_file, "stop1");
   strcpy(p1state_file, train_dir);
-  strcat(p1state_file, "stop1");
+  strcat(p1state_file, "start1");
   strcpy(dstate_file, train_dir);
   strcat(dstate_file, "pwm");
 
@@ -166,7 +179,12 @@ int main (int argc, char **argv){
       }
       i = 0;
     }else{
-      i += (strlen(mystring)-1);
+      bp_count = strlen(mystring)-1;
+      while(mystring[bp_count-1] == 10 || mystring[bp_count-1]==13){
+	bp_count --;
+      }
+
+      i += bp_count;
     }
   }
   obs_seq_len[count] = i;
@@ -187,9 +205,14 @@ int main (int argc, char **argv){
 	}
       }
 
-      obs_head = (char *)malloc(strlen(mystring) * sizeof(char));
-      memset(obs_head, 0, strlen(mystring) * sizeof(char));
-      memcpy(obs_head, mystring, strlen(mystring)-1);
+      bp_count = strlen(mystring)-1;
+      while(mystring[bp_count-1] == 10 || mystring[bp_count-1]==13){
+	bp_count --;
+      }
+
+      obs_head = (char *)malloc((bp_count+1) * sizeof(char));
+      memset(obs_head, 0, (bp_count+1) * sizeof(char));
+      memcpy(obs_head, mystring, bp_count);
 
       count++;
       obs_seq = (char *)malloc(obs_seq_len[count] * sizeof(char) + 1);
@@ -197,8 +220,12 @@ int main (int argc, char **argv){
       j = 0;
 
     }else{
-      memcpy(obs_seq+j, mystring, strlen(mystring)-1);
-      j += (strlen(mystring)-1);
+      bp_count = strlen(mystring)-1;
+      while(mystring[bp_count-1] == 10 || mystring[bp_count-1]==13){
+	bp_count --;
+      }
+      memcpy(obs_seq+j, mystring, bp_count);
+      j += bp_count;
     }
   }
 
@@ -207,11 +234,11 @@ int main (int argc, char **argv){
     get_prob_from_cg(&hmm, &train, obs_seq);
 
     if (strlen(obs_seq)>70){
-      printf("%d\n", strlen(obs_seq));
       viterbi(&hmm, obs_seq, fp_out, fp_aa, fp_dna, obs_head, wholegenome);
     }
   }
   
+
   fclose(fp_out);
   fclose(fp_aa);
   fclose(fp_dna);

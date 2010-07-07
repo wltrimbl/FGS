@@ -10,6 +10,7 @@ my ($id, $i, $j);
 my ($utr, $out, $e_save, $i_save, $codon, $command, $return_seq);
 my @freq;
 my @freq1;
+my @lines;
 
 GetOptions(
            'genome=s' => \$genome_file,
@@ -43,37 +44,40 @@ if ($cg < 26){
     $cg=69;
 }
 
-$freq_start_file = $dir."train/post_start/".$cg;
-$freq_start1_file = $dir."train/post_start_r/".$cg;
+# get frequency model  
+$freq_start_file = $dir."train/start";
+$freq_start1_file = $dir."train/start1";
 
-# get frequency model                                                                                            
-$id=0;
 open(IN, $freq_start_file);
-while(my $each_line=<IN>){
-    chomp($each_line);
-    if ($each_line!~/^\>/){
-	my @temp = split(/\s+/, $each_line);
-	for ($i=0; $i<=63; $i++){
-	    $freq[$id][$i] = $temp[$i];
-	}
-	$id+=1;
-    }
-}
+@lines = <IN>;
+chomp(@lines);
 close(IN);
 
 $id=0;
-open(IN, $freq_start1_file);
-while(my $each_line=<IN>){
-    chomp($each_line);
-    if ($each_line!~/^\>/){
-	my @temp = split(/\s+/, $each_line);
-	for ($i=0; $i<=63; $i++){
-	    $freq1[$id][$i] = $temp[$i];
-	}
-	$id+=1;
+for ($j=($cg-26)*62+1; $j<($cg-26+1)*62; $j += 1){
+    my @temp = split(/\s+/, $lines[$j]);
+    for ($i=0; $i<=63; $i++){
+	
+	$freq[$id][$i] = $temp[$i];
     }
+    $id+=1;
 }
+	
+open(IN, $freq_start1_file);
+@lines = <IN>;
+chomp(@lines);
 close(IN);
+
+$id=0;
+for ($j=($cg-26)*62+1; $j<($cg-26+1)*62; $j += 1){
+    my @temp = split(/\s+/, $lines[$j]);
+    for ($i=0; $i<=63; $i++){
+	
+	$freq1[$id][$i] = $temp[$i];
+    }
+    $id+=1;
+}
+	
 
 
 # find the optimal start codon with 30bp up- and downstream of start codon

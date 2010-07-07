@@ -54,6 +54,7 @@
 #define TR_RS 10
 #define TR_RR 11
 #define TR_ES 12
+#define TR_ES1 13
 
 
 typedef struct {
@@ -61,7 +62,7 @@ typedef struct {
   double  pi[29];    /* pi[1..N] pi[i] is the initial state distribution. */
   int N;               /* number of state */
 
-  double tr[13];                 /* transition probability from a (delete/insert/match) state to a state */
+  double tr[14];                 /* transition probability from a (delete/insert/match) state to a state */
 
   double e_M_1[6][16][4];      /* transition probability from a lowest-level state  to a  lowest-level state*/
   double e_M[6][16][4];

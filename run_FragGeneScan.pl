@@ -63,6 +63,7 @@ system($command);
 if ($FGS_whole eq "1"){
     system($dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out");
     system("rm ".$FGS_result);
+
 }else{
     system("mv ".$FGS_result." ".$FGS_result.".out");
 }
