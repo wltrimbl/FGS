@@ -4,11 +4,12 @@
 #include <values.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <ctype.h>
 #include "hmm.h"
 #include "util_lib.h"
 
 
-void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, char *head, int whole_genome){
+void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, char *head, int whole_genome, int format){
 
   double max_dbl = 10000000000.0;
   int debug=0;   
@@ -16,7 +17,8 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   int *vpath;                          /* optimal path after backtracking */
   double **alpha;                      /* viterbi prob array */
   int **path;                          /* viterbi path array */
-  int i,j,l,m,n, x,y,z,t,jj,kk;              
+  int i,j,l,m,n, x,y,z,t,jj,kk;    
+  int temp_t;
   int ag_num;
 
   int orf_start=0;
@@ -42,8 +44,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   int codon_start;
   char dna[300000];
   char dna1[300000];
+  char dna_f[300000];
+  char dna_f1[300000];
   char protein[100000];
   int dna_id=0;
+  int dna_f_id=0;
   int out_nt;
   int start_t;
   int end_t;
@@ -736,6 +741,8 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
  
       memset(dna,0,300000);
       memset(dna1,0,300000);
+      memset(dna_f,0,300000);
+      memset(dna_f1,0,300000);
       memset(protein,0, 100000);
       memset(insert,0,100);
       memset(delete,0,100);
@@ -743,7 +750,9 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       insert_id = 0;
       delete_id = 0;
       dna_id = 0;
+      dna_f_id = 0;
       dna[dna_id]=O[t];
+      dna_f[dna_f_id]=O[t];
       start_orf=t+1;
       prev_match = vpath[t];
 
@@ -759,6 +768,19 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	end_t=t+3;
       }else{
 	end_t=t+1;
+
+	/* FGS1.12 start: remove incomplete codon */
+	temp_t = t;
+	while(vpath[temp_t] != M1_STATE && vpath[temp_t] != M4_STATE  && vpath[temp_t] != M1_STATE_1  && vpath[temp_t] != M4_STATE_1){
+	  dna_f[dna_f_id] = '\0';
+	  dna_f_id--;
+
+	  dna[dna_id] = '\0';
+	  dna_id--;
+
+	  temp_t--;
+	}
+	/* FGS1.12 end: remove incomplete codon */
       }
       final_score = (alpha[vpath[end_t-4]][end_t-4]- alpha[vpath[start_t+2]][start_t+2] )/(end_t-start_t-5);
       frame = start_orf%3;
@@ -787,8 +809,12 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	  fprintf(fp_dna, "%s_%d_%d_+\n", head_short, start_t, end_t);
 
 	  get_protein(dna,protein,1);
-	  fprintf(fp_aa, "%s\n", protein); 
-	  fprintf(fp_dna, "%s\n", dna); 
+	  fprintf(fp_aa, "%s\n", protein);
+	  if (format==0){
+	    fprintf(fp_dna, "%s\n", dna); 
+	  }else if (format==1){
+	    fprintf(fp_dna, "%s\n", dna_f); 
+	  }
 	  
 	}else if (codon_start==-1){
 	  
@@ -809,14 +835,20 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	  
 	  get_protein(dna,protein,-1);
 	  get_rc_dna(dna, dna1);
-	  fprintf(fp_aa, "%s\n", protein); 
-	  fprintf(fp_dna, "%s\n", dna1); 
+	  get_rc_dna_indel(dna_f, dna_f1);
+	  fprintf(fp_aa, "%s\n", protein);
+	  if (format==0){
+	    fprintf(fp_dna, "%s\n", dna1); 
+	  }else if (format==1){
+	    fprintf(fp_dna, "%s\n", dna_f1); 
+	  }
 	}
       }
       codon_start=0;
       start_t = -1;
       end_t = -1;
-      dna_id=0;
+      dna_id = 0;
+      dna_f_id = 0;
 
     }else if (codon_start!=0 && 
 	      ((vpath[t]>=M1_STATE && vpath[t]<=M6_STATE) || 
@@ -828,20 +860,25 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       }else{
 	out_nt = vpath[t]-prev_match;
       }
-      for (kk=0; kk<out_nt; kk++){
+      for (kk=0; kk<out_nt; kk++){   /* for deleted nt in reads */
 	dna_id ++;
-	dna[dna_id]='N';
+	dna[dna_id] = 'N';
+	dna_f_id ++;
+	dna_f[dna_f_id] = 'x';
 	if (kk>0){
 	  delete[delete_id]=t+1;
 	  delete_id++;
 	}
       }
       dna[dna_id]=O[t];
+      dna_f[dna_f_id]=O[t];
       prev_match = vpath[t];
 
-    }else if (codon_start!=0 && 
+    }else if (codon_start!=0 &&             
 	      ((vpath[t]>=I1_STATE && vpath[t]<=I6_STATE) || 
 	       (vpath[t]>=I1_STATE_1 && vpath[t]<=I6_STATE_1))){
+      dna_f_id ++;
+      dna_f[dna_f_id] = tolower(O[t]);
       insert[insert_id]=t+1;
       insert_id++;
 
@@ -852,6 +889,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       start_t=-1;
       end_t = -1;
       dna_id=0;
+      dna_f_id=0;
 
     }
   }

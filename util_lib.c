@@ -183,6 +183,25 @@ int nt2int_rc (char nt){
   return result;
 }
 
+int nt2int_rc_indel (char nt){
+
+  int result;
+
+  if      (nt == 'A' ){  result = 3; }
+  else if (nt == 'C' ){  result = 2; }
+  else if (nt == 'G' ){  result = 1; }
+  else if (nt == 'T' ){  result = 0; }
+  else if (nt == 'a' ){  result = 8; }
+  else if (nt == 'c' ){  result = 7; }
+  else if (nt == 'g' ){  result = 6; }
+  else if (nt == 't' ){  result = 5; }
+  else if (nt == 'n' ){  result = 9; }
+  else if (nt == 'x' ){  result = 10;}
+  else                {  result = 4; }
+
+  return result;
+}
+
 
 int trinucleotide (char a, char b, char c){
 
@@ -247,6 +266,18 @@ void get_rc_dna(char *dna, char *dna1){
     dna1[dna_len-i-1] =codon[nt2int_rc(dna[i])];
   }
 }
+
+void get_rc_dna_indel(char *dna, char *dna1){
+
+  char codon[11] = {'A', 'C', 'G', 'T', 'N', 'a', 'c', 'g', 't', 'n', 'x'};
+  int i;
+  int dna_len = strlen(dna);
+  for (i=0; i<dna_len; i++){
+    
+    dna1[dna_len-i-1] =codon[nt2int_rc_indel(dna[i])];
+  }
+}
+
 
 void get_protein(char *dna, char *protein,  int strand){
 

@@ -14,24 +14,23 @@ int main (int argc, char **argv){
   char *obs_seq, *obs_head;
   TRAIN train;
   int wholegenome;
+  int format=0;
   FILE *fp_out, *fp_aa, *fp_dna, *fp;
-  char hmm_file[100] = "";
-  char aa_file[100] = "";
-  char seq_file[100] = "";
-  char out_file[100] = "";
-  char dna_file[100] = "";
-  char train_file[100] = "";
-  char mstate_file[100] = "";
-  char rstate_file[100] = "";
-  char nstate_file[100] = "";
-  char sstate_file[100] = "";
-  char pstate_file[100] = "";
-  char s1state_file[100] = "";     /* stop codon of gene in - stand */
-  char p1state_file[100] = "";
-  char dstate_file[100] = "";
-  char prob_indel[100] = "";
-  char prob_noindel[100] = "";
-  char train_dir[100] = "";
+  char hmm_file[4096] = "";
+  char aa_file[4096] = "";
+  char seq_file[4096] = "";
+  char out_file[4096] = "";
+  char dna_file[4096] = ""; 
+  char train_file[4096] = "";
+  char mstate_file[4096] = "";
+  char rstate_file[4096] = "";
+  char nstate_file[4096] = "";
+  char sstate_file[4096] = "";
+  char pstate_file[4096] = "";
+  char s1state_file[4096] = "";     /* stop codon of gene in - stand */
+  char p1state_file[4096] = "";
+  char dstate_file[4096] = "";
+  char train_dir[4096] = "";
   int count=0;
   char mystring[1000] = "";
   int *obs_seq_len;
@@ -58,13 +57,13 @@ int main (int argc, char **argv){
 
 
   /* read command line argument */
-  if (argc != 9){    
+  if (argc <= 8){    
     fprintf(stderr, "ERROR: You missed some parameters for input\n");
     print_usage();
     exit(EXIT_FAILURE);
   }
 
-  while ((c=getopt(argc, argv, "s:o:w:t:")) != -1){
+  while ((c=getopt(argc, argv, "fs:o:w:t:")) != -1){
 
     switch (c){
     case 's':
@@ -96,6 +95,9 @@ int main (int argc, char **argv){
 	print_usage();
 	exit(EXIT_FAILURE);
       }
+      break;
+    case 'f':
+      format = 1;
       break;
     }
   }
@@ -201,7 +203,7 @@ int main (int argc, char **argv){
  	get_prob_from_cg(&hmm, &train, obs_seq);
 
  	if (strlen(obs_seq)>70){
-	  viterbi(&hmm, obs_seq, fp_out, fp_aa, fp_dna, obs_head, wholegenome);
+	  viterbi(&hmm, obs_seq, fp_out, fp_aa, fp_dna, obs_head, wholegenome, format);
 	}
       }
 
@@ -234,7 +236,7 @@ int main (int argc, char **argv){
     get_prob_from_cg(&hmm, &train, obs_seq);
 
     if (strlen(obs_seq)>70){
-      viterbi(&hmm, obs_seq, fp_out, fp_aa, fp_dna, obs_head, wholegenome);
+      viterbi(&hmm, obs_seq, fp_out, fp_aa, fp_dna, obs_head, wholegenome, format);
     }
   }
   
