@@ -193,12 +193,13 @@ int main (int argc, char **argv){
 
   count=-1;
   rewind(fp);
+  j ==0;
 
   while ( fgets (mystring , sizeof mystring  , fp) ){
 
     if (mystring[0] == '>'){
 
-      if (count>=0){
+      if (count>=0 && j>0){
 
  	get_prob_from_cg(&hmm, &train, obs_seq);
 
@@ -216,9 +217,11 @@ int main (int argc, char **argv){
       memset(obs_head, 0, (bp_count+1) * sizeof(char));
       memcpy(obs_head, mystring, bp_count);
 
-      count++;
-      obs_seq = (char *)malloc(obs_seq_len[count] * sizeof(char) + 1);
-      memset(obs_seq, 0, obs_seq_len[count] * sizeof(char) + 1);
+      if (count== -1 || (count>=0 && j>0)){
+	count++;
+	obs_seq = (char *)malloc(obs_seq_len[count] * sizeof(char) + 1);
+	memset(obs_seq, 0, obs_seq_len[count] * sizeof(char) + 1);
+      }
       j = 0;
 
     }else{
