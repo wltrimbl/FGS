@@ -92,6 +92,8 @@ while(my $each_line=<IN>){
 	print OUT $each_line."\n";
     }elsif ($temp[2] eq "+"){
 	my $i=0;
+
+
 	$codon = substr($genome_seq, $temp[0]-1, 3);
 
 	while ($codon !~ /TAA|TAG|TGA/ &&$temp[0]-1-$i-35>=0  ){
@@ -120,7 +122,11 @@ while(my $each_line=<IN>){
 		}
 	    }
 	    $i += 3;
-	    $codon = substr($genome_seq, $temp[0]-1-$i, 3);
+	    if ($temp[0]-1-$i >= 0 && $temp[0]-1-$i <= length($genome_seq)-3){ #mina
+		$codon = substr($genome_seq, $temp[0]-1-$i, 3);
+	    }else{                                                             #mina 
+		last;                                                          #mina 
+	    }                                                                  #mina
 	}
 	print OUT eval($temp[0]+$i_save)."\t".$temp[1]."\t".$temp[2]."\t".$temp[3]."\t".$temp[4]."\t".$temp[5]."\t".$temp[6]."\n";
 	

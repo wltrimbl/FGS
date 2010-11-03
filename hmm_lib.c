@@ -63,8 +63,8 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   char *head_short=NULL;
   char delimi[] = " ";
   
-  int temp_i[6];
-  int temp_i_1[6];
+  int temp_i[6] = {0,0,0,0,0,0};
+  int temp_i_1[6] = {0,0,0,0,0,0};
 
   int num_N=0;
   /***************************************************************/
@@ -86,11 +86,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   }
   
   /* stop state */
-  if (O[0] == 'T' &&
-      ((O[1] == 'A' && O[2] == 'A') ||
-       (O[1] == 'A' && O[2] == 'G') ||
-       (O[1] == 'G' && O[2] == 'A'))) {
-    
+  if ((O[0] == 'T'|| O[0] == 't')  &&
+      (((O[1] == 'A'|| O[1] == 'a') && (O[2] == 'A'|| O[2] == 'a')) ||
+       ((O[1] == 'A'|| O[1] == 'a') && (O[2] == 'G'|| O[2] == 'g')) ||
+       ((O[1] == 'G'|| O[1] == 'g') && (O[2] == 'A'|| O[2] == 'a')))) {
+  
     alpha[E_STATE][0] = max_dbl;     
     alpha[E_STATE][1] = max_dbl;   
     path[E_STATE][1] = E_STATE; 
@@ -103,19 +103,19 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
     alpha[M2_STATE][1] = max_dbl;
     alpha[M1_STATE][0] = max_dbl;
     
-    if (O[1] == 'A' && O[2] == 'A' ){
+    if ((O[1] == 'A'|| O[1] == 'a') && (O[2] == 'A'|| O[2] == 'a')){
       alpha[E_STATE][2] = alpha[E_STATE][2] - log(0.53);
-    }else if (O[1] == 'A' && O[2] == 'G' ){
+    }else if ((O[1] == 'A'|| O[1] == 'a') && (O[2] == 'G'|| O[2] == 'g')){
       alpha[E_STATE][2] = alpha[E_STATE][2] - log(0.16);
-    }else if(O[1] == 'G' && O[2] == 'A' ){
+    }else if((O[1] == 'G'|| O[1] == 'g') && (O[2] == 'A'|| O[2] == 'a')){
       alpha[E_STATE][2] = alpha[E_STATE][2] - log(0.30);
     }
   }      
 
-  if (O[2] == 'A' &&
-      ((O[0] == 'T' && O[1] == 'T' ) ||
-       (O[0] == 'C' && O[1] == 'T' ) ||
-       (O[0] == 'T' && O[1] == 'C' ))) {
+  if ((O[2] == 'A'|| O[0] == 'a')  &&
+      (((O[0] == 'T'|| O[0] == 't') && (O[1] == 'T'|| O[1] == 't')) ||
+       ((O[0] == 'C'|| O[0] == 'c') && (O[1] == 'T'|| O[1] == 't')) ||
+       ((O[0] == 'T'|| O[0] == 't') && (O[1] == 'C'|| O[1] == 'c')))) {
  	
     alpha[S_STATE_1][0] = max_dbl;       
     alpha[S_STATE_1][1] = max_dbl;
@@ -126,11 +126,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
     alpha[M3_STATE_1][2] = max_dbl;
     alpha[M6_STATE_1][2] = max_dbl;
 
-    if (O[0] == 'T' && O[1] == 'T'  ){
+    if ((O[0] == 'T'|| O[0] == 't') && (O[1] == 'T'|| O[1] == 't')){
       alpha[S_STATE_1][2] = alpha[S_STATE_1][2] - log(0.53);
-    }else if (O[0] == 'C' && O[1] == 'T'  ){
+    }else if ((O[0] == 'C'|| O[0] == 'c') && (O[1] == 'T'|| O[1] == 't')){
       alpha[S_STATE_1][2] = alpha[S_STATE_1][2] - log(0.16);
-    }else if(O[0] == 'T' && O[1] == 'C' ){
+    }else if((O[0] == 'T'|| O[0] == 't') && (O[1] == 'C'|| O[1] == 'c')){
       alpha[S_STATE_1][2] = alpha[S_STATE_1][2] - log(0.30);
     }
   }
@@ -138,12 +138,16 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   /******************************************************************/
   /*  fill out the rest of the columns                              */
   /******************************************************************/
-  
   for (t = 1; t < len_seq; t++) {
 
-    from = nt2int(O[t-1]);       
-    from0 = nt2int(O[t-2]);                                        
+    from = nt2int(O[t-1]);    
+    if (t>1){
+      from0 = nt2int(O[t-2]);
+    }else{
+      from0 = 2;
+    }
     to = nt2int(O[t]);    
+
 
     /* if DNA is other than ACGT, do it later */
     if (from==4){ from=2; }
@@ -174,7 +178,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	    j = M6_STATE;
 	    alpha[i][t] = alpha[j][t-1] - log(hmm_ptr->tr[TR_GG]) - log(hmm_ptr->tr[TR_MM]) - log(hmm_ptr->e_M[0][from2][to]);
 	    path[i][t] = j;
-	    
+
 	    /* from D state */
 	    if (whole_genome==0){
 	      for (j=M5_STATE; j>=M1_STATE; j--){
@@ -235,21 +239,23 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	    }
 	  }
 	
-	
 	  /* from I state */
 	  if (i==M1_STATE) { j = I6_STATE;
 	  }else{ j = I1_STATE + (i - M1_STATE -1); }
 	  
+
 	  /* to aviod stop codon */
-	  if((i==M2_STATE || i==M5_STATE) && O[temp_i[j-I1_STATE]] == 'T' && 
-	     ((O[t] == 'A' && O[t+1] =='A') || (O[t] == 'A' && O[t+1] =='G') ||(O[t] == 'G' && O[t+1] =='A') )){
+          if (t<2){
+          }else if((i==M2_STATE || i==M5_STATE) && (O[temp_i[j-I1_STATE]] == 'T'||O[temp_i[j-I1_STATE]] =='t') && 
+		   (((O[t] == 'A'||O[t] == 'a') && (O[t+1] =='A'||O[t+1] =='a')) || 
+		    ((O[t] == 'A'||O[t] == 'a') && (O[t+1] =='G'||O[t+1] =='g')) ||
+		    ((O[t] == 'G'||O[t] == 'g') && (O[t+1] =='A'||O[t+1] =='a')))){
 	    
-	  }else if ((i==M3_STATE || i==M6_STATE) && O[temp_i[j-I1_STATE]-1] == 'T' && 
-		    ((O[temp_i[j-I1_STATE]] == 'A' && O[t] =='A') || 
-		     (O[temp_i[j-I1_STATE]] == 'A' && O[t] =='G') ||
-		     (O[temp_i[j-I1_STATE]] == 'G' && O[t] =='A') )){
+	  }else if ((i==M3_STATE || i==M6_STATE) && (O[temp_i[j-I1_STATE]-1] == 'T'||O[temp_i[j-I1_STATE]-1] =='t') && 
+		    (((O[temp_i[j-I1_STATE]] == 'A'||O[temp_i[j-I1_STATE]] == 'a') && (O[t] =='A'||O[t] == 'a')) || 
+		     ((O[temp_i[j-I1_STATE]] == 'A'||O[temp_i[j-I1_STATE]] == 'a') && (O[t] =='G'||O[t] == 'g')) ||
+		     ((O[temp_i[j-I1_STATE]] == 'G'||O[temp_i[j-I1_STATE]] == 'g') && (O[t] =='A'||O[t] == 'a')))){
 	  }else{
-	    
 	    temp_alpha = alpha[j][t-1]  - log(hmm_ptr->tr[TR_IM]) - log(0.25);
 	    if ( temp_alpha < alpha[i][t]){
 	      alpha[i][t] = temp_alpha; 
@@ -259,7 +265,6 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	}
       }
     }
-    
     
     /******************/
     /* I state        */ 
@@ -290,17 +295,16 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       }
     }
     
-    
     /******************/
     /* M' state        */ 
     /******************/
     
     for (i=M1_STATE_1; i<=M6_STATE_1; i++)   {                                       
-      
+   
       if  ((i==M1_STATE_1 || i==M4_STATE_1)&& t>=3 &&
-	   ((O[t-3] == 'T' && O[t-2] == 'T' && O[t-1] == 'A') ||
-	    (O[t-3] == 'C' && O[t-2] == 'T' && O[t-1] == 'A') ||
-	    (O[t-3] == 'T' && O[t-2] == 'C' && O[t-1] == 'A'))){
+	   (((O[t-3] == 'T'||O[t-3] == 't') && (O[t-2] == 'T'||O[t-2] == 't') && (O[t-1] == 'A'||O[t-1] =='a')) ||
+	    ((O[t-3] == 'C'||O[t-3] == 'c') && (O[t-2] == 'T'||O[t-2] == 't') && (O[t-1] == 'A'||O[t-1] =='a')) ||
+	    ((O[t-3] == 'T'||O[t-3] == 't') && (O[t-2] == 'C'||O[t-2] == 'c') && (O[t-1] == 'A'||O[t-1] =='a')))){
 	
 	/* from Start state  since this is actually stop codon in minus strand */
 	alpha[i][t] = alpha[S_STATE_1][t-1] - log(hmm_ptr->e_M_1[i-M1_STATE_1][from2][to]);
@@ -374,13 +378,22 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	  
 	  
 	  /* to aviod stop codon */
-	  if((i==M2_STATE_1 || i==M5_STATE_1) && O[t+1] == 'A' && 
-	     ((O[temp_i_1[j-I1_STATE_1]] == 'T' && O[t] =='T') || (O[temp_i_1[j-I1_STATE_1]] == 'C' && O[t] =='T') ||(O[temp_i_1[j-I1_STATE_1]] == 'T' && O[t] =='C') )){
+	  	  /* to aviod stop codon */
+          if (t<2){
+          }else  if((i==M2_STATE_1 || i==M5_STATE_1) && (O[t+1] == 'A'||O[t+1] == 'a') && 
+		    (((O[temp_i_1[j-I1_STATE_1]] == 'T'|| O[temp_i_1[j-I1_STATE_1]] == 't') && (O[t] =='T'|| O[t] =='t')) || 
+		     ((O[temp_i_1[j-I1_STATE_1]] == 'C'|| O[temp_i_1[j-I1_STATE_1]] == 'c') && (O[t] =='T'|| O[t] =='t')) || 
+		     ((O[temp_i_1[j-I1_STATE_1]] == 'T'|| O[temp_i_1[j-I1_STATE_1]] == 't') && (O[t] =='C'|| O[t] =='c')))){
 	    
-	  }else if ((i==M3_STATE_1 || i==M6_STATE_1) && O[t] == 'A' && 
-		    ((O[temp_i_1[j-I1_STATE_1]-1] == 'T' && O[temp_i_1[j-I1_STATE_1]] =='T') || 
-		     (O[temp_i_1[j-I1_STATE_1]-1] == 'C' && O[temp_i_1[j-I1_STATE_1]] =='T') ||
-		     (O[temp_i_1[j-I1_STATE_1]-1] == 'T' && O[temp_i_1[j-I1_STATE_1]] =='C') )){
+	  }else if ((i==M3_STATE_1 || i==M6_STATE_1) && (O[t] == 'A'||O[t] == 'a') && 
+		    (((O[temp_i_1[j-I1_STATE_1]-1] == 'T'|| O[temp_i_1[j-I1_STATE_1]-1]=='t') && 
+		      (O[temp_i_1[j-I1_STATE_1]] =='T'|| O[temp_i_1[j-I1_STATE_1]] =='t')) ||
+ 
+		     ((O[temp_i_1[j-I1_STATE_1]-1] == 'C'|| O[temp_i_1[j-I1_STATE_1]-1]=='c') && 
+		      (O[temp_i_1[j-I1_STATE_1]] =='T'|| O[temp_i_1[j-I1_STATE_1]] =='t')) ||
+ 
+		     ((O[temp_i_1[j-I1_STATE_1]-1] == 'T'|| O[temp_i_1[j-I1_STATE_1]-1]=='t') && 
+		      (O[temp_i_1[j-I1_STATE_1]] =='C'|| O[temp_i_1[j-I1_STATE_1]] =='c')))){
 	  }else{
 	    
 	    temp_alpha = alpha[j][t-1]  - log(hmm_ptr->tr[TR_IM]) - log(0.25);
@@ -392,7 +405,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	}
       }
     }
-    
+
     /******************/
     /* I' state        */ 
     /******************/
@@ -446,6 +459,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       alpha[R_STATE][t] -= log(0.95); 
     }
 
+
     /******************/
     /* END state      */ 
     /******************/
@@ -454,10 +468,10 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       alpha[E_STATE][t] = max_dbl;  
       path[E_STATE][t] = NOSTATE;    
       
-      if (t < len_seq -2 && O[t] == 'T' &&
-	  ((O[t+1] == 'A' && O[t+2] == 'A') ||
-	   (O[t+1] == 'A' && O[t+2] == 'G') ||
-	   (O[t+1] == 'G' && O[t+2] == 'A'))) {
+    if (t < len_seq -2 && (O[t] == 'T'||O[t] == 't')  &&
+	(((O[t+1] == 'A'||O[t+1] == 'a') && (O[t+2] == 'A'||O[t+2] =='a')) ||
+	 ((O[t+1] == 'A'||O[t+1] == 'a') && (O[t+2] == 'G'||O[t+2] =='g')) ||
+	 ((O[t+1] == 'G'||O[t+1] == 'g') && (O[t+2] == 'A'||O[t+2] =='a')))) {
 	
 	alpha[E_STATE][t+2] = max_dbl;  
 	/* transition from frame4,frame5,and frame6 */
@@ -486,11 +500,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	alpha[M2_STATE][t+1] = max_dbl;
 	alpha[M1_STATE][t] = max_dbl;
 
-	if (O[t+1] == 'A' && O[t+2] == 'A' ){
+	if ((O[t+1] == 'A'||O[t+1] =='a') && (O[t+2] == 'A'||O[t+2] =='a')){
 	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(0.54);
-	}else if (O[t+1] == 'A' && O[t+2] == 'G' ){
+	}else if ((O[t+1] == 'A'||O[t+1] =='a') && (O[t+2] == 'G'||O[t+2] =='g')){
 	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(0.16);
-	}else if(O[t+1] == 'G' && O[t+2] == 'A' ){
+	}else if((O[t+1] == 'G'||O[t+1] == 'g') && (O[t+2] == 'A'||O[t+2] =='a')) {
 	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(0.30);
 	}
 
@@ -521,10 +535,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       alpha[S_STATE_1][t] = max_dbl;  
       path[S_STATE_1][t] = NOSTATE;    
       
-      if (t<len_seq-2 && O[t+2] == 'A' &&
-	  ((O[t] == 'T' && O[t+1] == 'T' ) ||
-	   (O[t] == 'C' && O[t+1] == 'T' ) ||
-	   (O[t] == 'T' && O[t+1] == 'C' ))) {
+      
+      if (t<len_seq-2 && (O[t+2] == 'A'||O[t+2] == 'a') &&
+	  (((O[t] == 'T'||O[t] =='t') && (O[t+1] == 'T'|| O[t+1] == 't')) ||
+	   ((O[t] == 'C'||O[t] =='c') && (O[t+1] == 'T'|| O[t+1] == 't')) ||
+	   ((O[t] == 'T'||O[t] =='t') && (O[t+1] == 'C'|| O[t+1] == 'c')))) {
 	
 	alpha[S_STATE_1][t] = max_dbl;       
 	path[S_STATE_1][t] = R_STATE;  
@@ -548,11 +563,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
         alpha[M3_STATE_1][t+2] = max_dbl;
         alpha[M6_STATE_1][t+2] = max_dbl;
 
-	if (O[t] == 'T' && O[t+1] == 'T'  ){
+	if ((O[t] == 'T'||O[t] == 't') && (O[t+1] == 'T'||O[t+1] == 't')){
 	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(0.54);
-	}else if (O[t] == 'C' && O[t+1] == 'T'  ){
+	}else if ((O[t] == 'C'||O[t] =='c') && (O[t+1] == 'T'||O[t+1]=='t')){
 	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(0.16);
-	}else if(O[t] == 'T' && O[t+1] == 'C' ){
+	}else if((O[t] == 'T'||O[t] =='t') && (O[t+1] == 'C'||O[t+1] =='c')){
 	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(0.30);
 	}
 
@@ -582,8 +597,8 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       alpha[S_STATE][t] = max_dbl;  
       path[S_STATE][t] = NOSTATE;    
       
-      if (t<len_seq-2 &&  O[t+1] == 'T' && O[t+2] == 'G'&&  
-	  (O[t] == 'A' || O[t] == 'G' ||  O[t] == 'T')) {
+      if (t<len_seq-2 &&  (O[t+1] == 'T'||O[t+1] =='t') && (O[t+2] == 'G'||O[t+2] =='g')&&  
+	  ((O[t] == 'A'||O[t] =='a') || (O[t] == 'G'||O[t] =='g') ||  (O[t] == 'T'||O[t] =='t'))) {
 	
 	alpha[S_STATE][t] = max_dbl;       
 	alpha[S_STATE][t+1] = max_dbl;     
@@ -605,11 +620,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	}
 
 	
-	if (O[t] == 'A' ){
+	if ((O[t] == 'A'||O[t] =='a') ){
 	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(0.83);
-	}else if (O[t] == 'G'){
+	}else if ((O[t] == 'G'||O[t] =='g')){
 	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(0.10);
-	}else if(O[t] == 'T') {
+	}else if((O[t] == 'T'||O[t] == 't')) {
 	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(0.07);
 	}
 
@@ -641,8 +656,8 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       alpha[E_STATE_1][t] = max_dbl;  
       path[E_STATE_1][t] = NOSTATE;    
 
-      if (t < len_seq - 2 && O[t] == 'C' && O[t+1] == 'A' && 
-	  (O[t+2] == 'T' || O[t+2] == 'C' || O[t+2] == 'A')) {
+      if (t < len_seq - 2 && (O[t] == 'C'||O[t] =='c') && (O[t+1] == 'A'||O[t+1] == 'a') && 
+	  ((O[t+2] == 'T'||O[t+2] =='t') || (O[t+2] == 'C'||O[t+2] =='c') || (O[t+2] == 'A'||O[t+2] =='a'))) {
 
 	/* transition from frame6 */
 	alpha[E_STATE_1][t+2] = alpha[M6_STATE_1][t-1] - log(hmm_ptr->tr[TR_GE]); 
@@ -652,11 +667,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	path[E_STATE_1][t+1] = E_STATE_1; 
 	path[E_STATE_1][t+2] = E_STATE_1;
 	
-	if (O[t+2] == 'T' ){
+	if ((O[t+2] == 'T'||O[t+2] == 't') ){
 	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(0.83);
-	}else if (O[t+2] == 'C' ){
+	}else if ((O[t+2] == 'C'||O[t+2] =='c') ){
 	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(0.10);
-	}else if(O[t+2] == 'A' ){
+	}else if((O[t+2] == 'A'||O[t+2] =='a') ){
 	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(0.07);
 	}
 
@@ -689,11 +704,10 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
     }
 /*     printf("%d(%c)\t", t,O[t] ); */
 /*     for (i = 0; i < hmm_ptr->N; i++){ */
-      
 /*       printf("%lf(%d %d)\t", alpha[i][t],path[i][t], i); */
+      
 /*     } */
 /*     printf("\n\n"); */
-
   }
 
   /***********************************************************/
@@ -910,7 +924,7 @@ void get_prob_from_cg(HMM *hmm_ptr, TRAIN *train_ptr, char *O){
 
   len_seq = strlen(O);
   for (i=0; i<len_seq; i++){
-    if (O[i] == 'C' || O[i] == 'G'){
+    if ((O[i] == 'C'||O[i] =='c') || (O[i] == 'G'||O[i] == 'g') ){
       cg_count++;
     }
   }
