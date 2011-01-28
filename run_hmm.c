@@ -243,7 +243,8 @@ int main (int argc, char **argv){
     }
   }
   
-
+  free(obs_seq_len);
+  free(obs_head);
   fclose(fp_out);
   fclose(fp_aa);
   fclose(fp_dna);

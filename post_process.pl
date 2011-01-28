@@ -4,13 +4,7 @@ use Getopt::Long;
 
 my ($genome_file, $gff_file, $new_gff_file);
 my ($freq_start_file, $freq_start1_file);
-my ($len, $count, $cg);
-my ($genome_seq, $head, $temp_genome_seq);
-my ($id, $i, $j);
-my ($utr, $out, $e_save, $i_save, $codon, $command, $return_seq);
-my @freq;
-my @freq1;
-my @lines;
+my ($seq, $head);
 
 GetOptions(
            'genome=s' => \$genome_file,
@@ -31,18 +25,8 @@ my %freq_unit =('AAA',0,'AAC',1,'AAG',2,'AAT',3,'ACA',4,'ACC',5,'ACG',6,'ACT',7,
 
 my $program = $0;
 my $dir = substr($0, 0, length($0)-15);
+my (@lines, @lines1);
 
-get_sequence($genome_file, \$genome_seq, \$head);
-$temp_genome_seq = $genome_seq;
-$len = length($genome_seq);
-$count = ($temp_genome_seq =~ s/C|G|c|g//g);
-$temp_genome_seq="";
-$cg = sprintf("%.0f", $count*100/$len);
-if ($cg < 26){
-    $cg=26;
-}elsif($cg>69){
-    $cg=69;
-}
 
 # get frequency model  
 $freq_start_file = $dir."train/start";
@@ -53,135 +37,179 @@ open(IN, $freq_start_file);
 chomp(@lines);
 close(IN);
 
-$id=0;
-for ($j=($cg-26)*62+1; $j<($cg-26+1)*62; $j += 1){
-    my @temp = split(/\s+/, $lines[$j]);
-    for ($i=0; $i<=63; $i++){
-	
-	$freq[$id][$i] = $temp[$i];
-    }
-    $id+=1;
-}
-	
 open(IN, $freq_start1_file);
-@lines = <IN>;
-chomp(@lines);
+@lines1 = <IN>;
+chomp(@lines1);
 close(IN);
 
-$id=0;
-for ($j=($cg-26)*62+1; $j<($cg-26+1)*62; $j += 1){
-    my @temp = split(/\s+/, $lines[$j]);
-    for ($i=0; $i<=63; $i++){
-	
-	$freq1[$id][$i] = $temp[$i];
-    }
-    $id+=1;
-}
-	
+# get out file info
+my ($h, %s);
 
-
-# find the optimal start codon with 30bp up- and downstream of start codon
-open OUT, ">$new_gff_file";
 open(IN, $gff_file);
 while(my $each_line=<IN>){
     
-    chomp($each_line);
-    my @temp = split(/\s+/, $each_line);
-
-    if ($each_line =~ /^\>/){
-	print OUT $each_line."\n";
-    }elsif ($temp[2] eq "+"){
-	my $i=0;
-
-
-	$codon = substr($genome_seq, $temp[0]-1, 3);
-
-	while ($codon !~ /TAA|TAG|TGA/ &&$temp[0]-1-$i-35>=0  ){
-	    
-	    if ($codon =~ /ATG|GTG|TTG/){
-		$utr = substr($genome_seq, $temp[0]-1-$i-30, 63);
-	     
-		my @temp1 = split(//, $utr);
-		my $freq_sum = 0;
-		if ($#temp1==62){
-		    for($j=0; $j<=60; $j++){
-			my $key = $temp1[$j].$temp1[$j+1].$temp1[$j+2];
-			if (exists $freq_unit{$key}){
-			    $freq_sum -= log($freq[$j][$freq_unit{$key}]);
-			}else{
-			    $freq_sum -= log(1/64);
-			}
-		    }
-		}
-		if ($i==0){
-		    $e_save = $freq_sum;
-		    $i_save = 0;
-		}elsif ($freq_sum < $e_save){
-		    $e_save = $freq_sum;
-		    $i_save = -1*$i;
-		}
-	    }
-	    $i += 3;
-	    if ($temp[0]-1-$i >= 0 && $temp[0]-1-$i <= length($genome_seq)-3){ #mina
-		$codon = substr($genome_seq, $temp[0]-1-$i, 3);
-	    }else{                                                             #mina 
-		last;                                                          #mina 
-	    }                                                                  #mina
-	}
-	print OUT eval($temp[0]+$i_save)."\t".$temp[1]."\t".$temp[2]."\t".$temp[3]."\t".$temp[4]."\t".$temp[5]."\t".$temp[6]."\n";
-	
-    }elsif ($temp[2] eq "-"){
-	my $i=0;
-	$codon = substr($genome_seq, $temp[1]-1-2, 3);
-	while ($codon !~ /TTA|CTA|TCA/ && $temp[1]-2+$i+35<length($genome_seq) ){
-	    
-	    if ($codon =~ /CAT|CAC|CAA/){
-		$utr = substr($genome_seq, $temp[1]-1-2+$i-30, 63);
-		my @temp1 = split(//, $utr);
-		my $freq_sum = 0;
-		if ($#temp1==62){
-		    for($j=0; $j<=60; $j++){
-			my $key = $temp1[$j].$temp1[$j+1].$temp1[$j+2];
-			if (exists $freq_unit{$key}){
-			    $freq_sum -= log($freq1[$j][$freq_unit{$key}]);
-			}else{
-			    $freq_sum -= log(1/64);
-			}
-		    }
-		}
-		if ($i==0){
-		    $e_save = $freq_sum;
-		    $i_save = 0;
-		}elsif ($freq_sum < $e_save){
-		    $e_save = $freq_sum;
-		    $i_save = $i;
-		}
-	    }
-	    $i += 3;
-	    $codon = substr($genome_seq, $temp[1]-1-2+$i, 3);
-	}
-	print OUT $temp[0]."\t".eval($temp[1]+$i_save)."\t".$temp[2]."\t".$temp[3]."\t".$temp[4]."\t".$temp[5]."\t".$temp[6]."\n";
+    if ($each_line=~/^\>(\S+)/){
+	$h = $1;
+    }else{
+	$s{$h} .= $each_line;
     }
 }
-close(OUT);
 close(IN);
 
-sub get_sequence{  # file name, @variable for seq, @variable for head
+open OUT, ">$new_gff_file";
 
-    open(GENOME, $_[0])|| die("ERROR: Couldn't open genome_file $_[0]!\n");
-    while( my $each_line=<GENOME>)  {
-
-        if ($each_line =~ m/>/){
-            ${$_[1]} = "";
-            chomp($each_line);
-            ${$_[2]} = $each_line;
-        }else{
-            chomp($each_line);
-            ${$_[1]} .= $each_line;
-        }
+$head = "";
+$seq = "";
+open(SEQ, $genome_file);
+while(my $each_line=<SEQ>){
+    
+    chomp($each_line);
+    if ($each_line=~/^\>(\S+)/){
+	
+	if (length($seq)>0){
+	    
+	    if (exists $s{$head}){
+		print OUT ">".$head."\n";
+		call_post(\$seq, \*OUT, \$s{$head},\@lines, \@lines1);
+	    }
+	}
+	$head = $1;
+	$seq = "";
+    }else{
+	$seq .= $each_line;
     }
-    close(GENOME);
 }
+print OUT ">".$head."\n";
+call_post(\$seq, \*OUT, \$s{$head},\@lines, \@lines1);
+
+close(OUT);
+close(SEQ);
+
+sub call_post{ #\genome_seq, OUT, \$s{$head}, \@lines, \@lines1
+
+    my ($len, $count, $cg);
+    my ($genome_seq, $temp_genome_seq);
+    my ($id, $i, $j);
+    my ($utr, $out, $e_save, $i_save, $codon, $command, $return_seq);
+    my $sff;
+    my (@freq, @freq1, @lines, @lines1);
 
 
+    $genome_seq = ${$_[0]};
+    $out = $_[1];
+    $sff = ${$_[2]};
+    @lines = @{$_[3]};
+    @lines1 = @{$_[4]};
 
+
+    #count cg contents
+    $temp_genome_seq = $genome_seq;
+    $len = length($genome_seq);
+    $count = ($temp_genome_seq =~ s/C|G|c|g//g);
+    $temp_genome_seq="";
+    $cg = sprintf("%.0f", $count*100/$len);
+
+    if ($cg < 26){
+	$cg=26;
+    }elsif($cg>69){
+	$cg=69;
+    }
+
+    $id=0;
+    for (my $j=($cg-26)*62+1; $j<($cg-26+1)*62; $j += 1){
+	my @temp = split(/\s+/, $lines[$j]);
+	for (my $i=0; $i<=63; $i++){
+	    
+	    $freq[$id][$i] = $temp[$i];
+	}
+	$id+=1;
+    }
+    
+    
+    $id=0;
+    for (my $j=($cg-26)*62+1; $j<($cg-26+1)*62; $j += 1){
+	my @temp = split(/\s+/, $lines1[$j]);
+	for (my $i=0; $i<=63; $i++){
+	    
+	    $freq1[$id][$i] = $temp[$i];
+	}
+	$id+=1;
+    }
+
+
+    # find the optimal start codon with 30bp up- and downstream of start codon
+    my @sffs = split(/\n/, $sff);
+    for(my $i=0; $i<=$#sffs; $i+=1){
+
+	my $each_line = $sffs[$i];
+	my @temp = split(/\s+/, $each_line);
+
+	$i_save=0;
+	if ($temp[2] eq "+"){
+	    my $i=0;
+	    $codon = substr($genome_seq, $temp[0]-1, 3);
+	    
+	    while ($codon !~ /TAA|TAG|TGA/ &&$temp[0]-1-$i-35>=0  ){
+		
+		if ($codon =~ /ATG|GTG|TTG/){
+		    $utr = substr($genome_seq, $temp[0]-1-$i-30, 63);
+		    
+		    my @temp1 = split(//, $utr);
+		    my $freq_sum = 0;
+		    if ($#temp1==62){
+			for($j=0; $j<=60; $j++){
+			    my $key = $temp1[$j].$temp1[$j+1].$temp1[$j+2];
+			    if (exists $freq_unit{$key}){
+				$freq_sum -= log($freq[$j][$freq_unit{$key}]);
+			    }else{
+				$freq_sum -= log(1/64);
+			    }
+			}
+		    }
+		    if ($i==0){
+			$e_save = $freq_sum;
+			$i_save = 0;
+		    }elsif ($freq_sum < $e_save){
+			$e_save = $freq_sum;
+			$i_save = -1*$i;
+		    }
+		}
+		$i += 3;
+		$codon = substr($genome_seq, $temp[0]-1-$i, 3);
+	    }
+	    print $out eval($temp[0]+$i_save)."\t".$temp[1]."\t".$temp[2]."\t".$temp[3]."\t".$temp[4]."\t".$temp[5]."\t".$temp[6]."\n";
+	    
+	}elsif ($temp[2] eq "-"){
+	    my $i=0;
+	    $codon = substr($genome_seq, $temp[1]-1-2, 3);
+	    while ($codon !~ /TTA|CTA|TCA/ && $temp[1]-2+$i+35<length($genome_seq) ){
+		
+		if ($codon =~ /CAT|CAC|CAA/){
+		    $utr = substr($genome_seq, $temp[1]-1-2+$i-30, 63);
+		    my @temp1 = split(//, $utr);
+		    my $freq_sum = 0;
+		    if ($#temp1==62){
+			for($j=0; $j<=60; $j++){
+			    my $key = $temp1[$j].$temp1[$j+1].$temp1[$j+2];
+			    if (exists $freq_unit{$key}){
+				$freq_sum -= log($freq1[$j][$freq_unit{$key}]);
+			    }else{
+				$freq_sum -= log(1/64);
+			    }
+			}
+		    }
+		    if ($i==0){
+			$e_save = $freq_sum;
+			$i_save = 0;
+		    }elsif ($freq_sum < $e_save){
+			$e_save = $freq_sum;
+			$i_save = $i;
+		    }
+		}
+		$i += 3;
+		$codon = substr($genome_seq, $temp[1]-1-2+$i, 3);
+	    }
+	    print $out $temp[0]."\t".eval($temp[1]+$i_save)."\t".$temp[2]."\t".$temp[3]."\t".$temp[4]."\t".$temp[5]."\t".$temp[6]."\n";
+	}
+    }
+}
