@@ -156,8 +156,12 @@ int main (int argc, char **argv){
   remove (dna_file);
 
   fp_aa = fopen (aa_file , "w");
+  if(fp_aa==0 ){fprintf(stderr, "error opening aa file %s\n", aa_file); exit(EXIT_FAILURE);}
   fp_out = fopen (out_file , "w");
+  if(fp_out ==0) {fprintf(stderr, "error opening out file %s\n", out_file); exit(EXIT_FAILURE);}
   fp_dna = fopen (dna_file , "w");
+  if(fp_dna ==0) {fprintf(stderr, "error opening dna file %s\n", dna_file); exit(EXIT_FAILURE);}
+
   fp = fopen (seq_file, "r");
 
   while ( fgets (mystring , sizeof mystring , fp) ){
