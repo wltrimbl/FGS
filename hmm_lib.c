@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include <values.h>
 #include <stdlib.h>
+#if !defined(__APPLE__)
 #include <malloc.h>
+#include <values.h>
+#else
+#include <limits.h>
+#endif
 #include <ctype.h>
 #include "hmm.h"
 #include "util_lib.h"

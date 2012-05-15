@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#if !defined(__APPLE__)
 #include <malloc.h>
+#endif
 #include <string.h>
 
 double log2(double a){
