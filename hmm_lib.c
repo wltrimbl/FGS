@@ -21,26 +21,18 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   int *vpath;                          /* optimal path after backtracking */
   double **alpha;                      /* viterbi prob array */
   int **path;                          /* viterbi path array */
-  int i,j,l,m,n, x,y,z,t,jj,kk;    
+  int i,j, t,kk;    
   int temp_t;
-  int ag_num;
 
-  int orf_start=0;
-  int orf_strand=0;
   int print_save;
-  int frame_save;
-  int orf_save;
-  double prob_save, start_freq;
+  double start_freq;
 
-  int best;
   int from, from0, to;   /*from0: i-2 position, from: i-1 position */
   int from2;             /* from2: i-2, i-1 for condition in emission probability */
-  double temp_alpha, temp, prob, prob2;
+  double temp_alpha, prob;
   int len_seq;
   int gene_len;
-  int count_ag;
 
-  int temp_strand;
   int num_d;          /* the number of delete */
   int freq_id;
   double h_kd, r_kd, p_kd;
@@ -63,7 +55,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   
   int insert[100];
   int delete[100];
-  int insert_id, delete_id;
+  int insert_id=0, delete_id=0;
   char *head_short=NULL;
   char delimi[] = " ";
   
@@ -932,7 +924,7 @@ void get_prob_from_cg(HMM *hmm_ptr, TRAIN *train_ptr, char *O){
   int cg_id = -1;
   int cg_count=0;
   int len_seq;
-  int i,j,k;
+  int i;
 
   len_seq = strlen(O);
   for (i=0; i<len_seq; i++){
