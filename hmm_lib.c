@@ -389,7 +389,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 		     ((O[temp_i_1[j-I1_STATE_1]] == 'C'|| O[temp_i_1[j-I1_STATE_1]] == 'c') && (O[t] =='T'|| O[t] =='t')) || 
 		     ((O[temp_i_1[j-I1_STATE_1]] == 'T'|| O[temp_i_1[j-I1_STATE_1]] == 't') && (O[t] =='C'|| O[t] =='c')))){
 	    
-	  }else if ((i==M3_STATE_1 || i==M6_STATE_1) &&  (j-I1_STATE_1 >=1) && (O[t] == 'A'||O[t] == 'a') && 
+	  }else if ((i==M3_STATE_1 || i==M6_STATE_1) &&  (j-I1_STATE_1 >=1) && (temp_i_1[j-I1_STATE_1] >=1) && (O[t] == 'A'||O[t] == 'a') && 
 		    (((O[temp_i_1[j-I1_STATE_1]-1] == 'T'|| O[temp_i_1[j-I1_STATE_1]-1]=='t') && 
 		      (O[temp_i_1[j-I1_STATE_1]] =='T'|| O[temp_i_1[j-I1_STATE_1]] =='t')) ||
  
@@ -423,7 +423,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	path[i][t] = j;
 	
 	/* from M state */
-	if (path[S_STATE_1][t-3]!= R_STATE && path[S_STATE_1][t-4] !=R_STATE && path[S_STATE_1][t-5] !=R_STATE){
+	if ((t > 5) && path[S_STATE_1][t-3]!= R_STATE && path[S_STATE_1][t-4] !=R_STATE && path[S_STATE_1][t-5] !=R_STATE){
 	  j = i - I1_STATE_1 + M1_STATE_1;
 	  if (i==I6_STATE_1){
 	    temp_alpha = alpha[j][t-1] - log(hmm_ptr->tr[TR_GG]) - log(hmm_ptr->tr[TR_MI]) -log(hmm_ptr->tr_M_I[from][to]); 
