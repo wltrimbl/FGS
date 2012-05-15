@@ -137,7 +137,7 @@ void free_imatrix(int **m,int num_row){
 
 int tr2int (char *tr){
 
-  int result;
+  int result=0;
 
   if      (strcmp(tr, "MM")==0){   result = 0; }
   else if (strcmp(tr, "MI")==0){   result = 1; }
@@ -153,7 +153,8 @@ int tr2int (char *tr){
   else if (strcmp(tr, "RR")==0){   result = 11;}
   else if (strcmp(tr, "ES")==0){   result = 12;}    /* ES: E+ -> S+, E- -> S- */
   else if (strcmp(tr, "ES1")==0){   result = 13;}   /* ES1: E+ -> S-, E- -> S+ */
-  
+  else {  fprintf(stderr, "%s\n", "ERROR: corrupt training data");
+    exit(EXIT_FAILURE);}
   return result;
 }
 
