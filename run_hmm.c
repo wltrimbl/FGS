@@ -193,7 +193,7 @@ int main (int argc, char **argv){
 
   count=-1;
   rewind(fp);
-  j ==0;
+  j = 0;
 
   while ( fgets (mystring , sizeof mystring  , fp) ){
 
@@ -249,6 +249,7 @@ int main (int argc, char **argv){
   fclose(fp_aa);
   fclose(fp_dna);
   fclose(fp);
+  return(0);
 }
 
 
