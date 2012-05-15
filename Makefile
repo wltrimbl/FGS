@@ -1,5 +1,5 @@
 CC=	gcc
-CFLAG= -O3
+CFLAG= -O3 -Wall -ggdb
 SRCS=	util_lib.c hmm_lib.c run_hmm.c
 OBJ=	util_lib.o hmm_lib.o run_hmm.o 
 
