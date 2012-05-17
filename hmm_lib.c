@@ -247,7 +247,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 		    ((O[t] == 'A'||O[t] == 'a') && (O[t+1] =='G'||O[t+1] =='g')) ||
 		    ((O[t] == 'G'||O[t] == 'g') && (O[t+1] =='A'||O[t+1] =='a')))){
 	    
-	  }else if ((i==M3_STATE || i==M6_STATE) && temp_i[j-I1_STATE >=1] && 
+	  }else if ((i==M3_STATE || i==M6_STATE) && temp_i[j-I1_STATE] >=1 && 
                        (O[temp_i[j-I1_STATE]-1] == 'T'|| O[temp_i[j-I1_STATE]-1] == 't') && 
 		    (((O[temp_i[j-I1_STATE]] == 'A'||O[temp_i[j-I1_STATE]] == 'a') && (O[t] =='A'||O[t] == 'a')) || 
 		     ((O[temp_i[j-I1_STATE]] == 'A'||O[temp_i[j-I1_STATE]] == 'a') && (O[t] =='G'||O[t] == 'g')) ||

@@ -16,9 +16,9 @@ int tr2int (char *nt);
 int nt2int (char nt);
 int nt2int_rc (char nt);
 
-
 int trinucleotide (char a, char b, char c);
 double log2(double a);
 void get_protein(char *dna, char *protein, int strand);
 void print_usage();
+void get_rc_dna_indel(char *dna, char *dna1);
   

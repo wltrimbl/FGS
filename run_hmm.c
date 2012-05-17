@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "hmm.h"
+#include "util_lib.h"
 
 
 int main (int argc, char **argv){
