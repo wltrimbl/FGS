@@ -14,7 +14,7 @@ int main (int argc, char **argv){
   HMM hmm;
   char *obs_seq, *obs_head;
   TRAIN train;
-  int wholegenome;
+  int wholegenome=-1;
   int format=0;
   FILE *fp_out, *fp_aa, *fp_dna, *fp;
   char hmm_file[4096] = "";

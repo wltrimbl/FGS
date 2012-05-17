@@ -37,7 +37,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   int freq_id;
   double h_kd, r_kd, p_kd;
 
-  int codon_start;
+  int codon_start=0;
   char dna[300000];
   char dna1[300000];
   char dna_f[300000];
@@ -48,8 +48,8 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   int out_nt;
   int start_t;
   int end_t;
-  int prev_match;
-  int start_orf;
+  int prev_match=0;
+  int start_orf=0;
   int frame;
   double final_score;
   
