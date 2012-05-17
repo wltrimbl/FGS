@@ -7,6 +7,7 @@ my $FGS_result = "";
 my $FGS_whole = -1;
 my $FGS_train_file = "";
 my $command;
+my $debug=1;
 my $program = $0;
 my $dir = substr($0, 0, length($0)-19);
 my $train_file;
@@ -58,14 +59,17 @@ $command .= " -s ".$genome_file;
 $command .= " -o ".$FGS_result;
 $command .= " -w ".$FGS_whole ;
 $command .= " -t ".$FGS_train_file;
+if($debug){print "$command\n";}
 system($command); 
 if($? != 0) {print "ERROR: '$command' return value $?\n"; exit;}
 
 if ($FGS_whole eq "1"){
+    if($debug){print $dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out\n";}
     system($dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out");
-    system("rm ".$FGS_result);
+    if(!$debug){system("rm ".$FGS_result);}
 
 }else{
+    if($debug){print "mv ".$FGS_result." ".$FGS_result.".out\n";}
     system("mv ".$FGS_result." ".$FGS_result.".out");
 }
 
