@@ -24,7 +24,6 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   int i,j, t,kk;    
   int temp_t;
 
-  int print_save;
   double start_freq;
 
   int from, from0, to;   /*from0: i-2 position, from: i-1 position */
@@ -743,7 +742,6 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 /*     printf("%d %d %c  \n",t, vpath[t], O[t]); */
   }
 
-  print_save = 0;
   codon_start=0;
   start_t=-1;
 
@@ -925,7 +923,6 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 
 void get_prob_from_cg(HMM *hmm_ptr, TRAIN *train_ptr, char *O){
 
-  int cg_id = -1;
   int cg_count=0;
   int len_seq;
   int i;
