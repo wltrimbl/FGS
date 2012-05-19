@@ -511,7 +511,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	start_freq=0;
 	freq_id = 0;
 	for(i=-60; i<=-3; i++){
-          if(t-60 >=0 &&t-1 < len_seq) {
+          if(t+i >=0 && t+i+2 < len_seq) {
 	  start_freq -= log(hmm_ptr->tr_E[i+60][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
           }
 	}
@@ -576,7 +576,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	start_freq=0;
 	freq_id = 0;
 	for(i=3; i<=60; i++){
-        if(t+3 >=0 &&t+62 < len_seq) {
+        if(t+i >=0 && t+i+2  < len_seq) {
 	  start_freq -= log(hmm_ptr->tr_S_1[i-3][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
           }
 	}
@@ -635,7 +635,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	start_freq=0;
 	freq_id = 0;
 	for(i=-30; i<=30; i++){
-        if(t-30 >=0 && t+32 < len_seq) {
+        if(t+i  >=0 && t+i+2 < len_seq) {
 	  start_freq -= log(hmm_ptr->tr_S[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
            }
 	}
@@ -684,7 +684,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	start_freq=0;
 	freq_id = 0;
 	for(i=-30; i<=30; i++){
-          if(t-30 >=0 &&t+32 < len_seq) {
+          if(t+i >=0 && t+i+2 < len_seq) {
 	  start_freq -= log(hmm_ptr->tr_E_1[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
            }
 	}
