@@ -33,9 +33,9 @@ int main (int argc, char **argv){
   char dstate_file[4096] = "";
   char train_dir[4096] = "";
   int count=0;
-  char mystring[1000] = "";
+  char mystring[1000] = "";        /* input buffer  */
   int *obs_seq_len;
-  int bp_count;  /* count the length of each line in input file */
+  int bp_count=0;  /* count the length of each line in input file */
 
   strncpy(train_dir, argv[0], strlen(argv[0])-12);
   strcat(train_dir, "train/");
@@ -163,8 +163,8 @@ int main (int argc, char **argv){
   fp_dna = fopen (dna_file , "w");
   if(fp_dna ==0) {fprintf(stderr, "error opening dna file %s\n", dna_file); exit(EXIT_FAILURE);}
 
+ /*  Parse input, count records, store in int num_seq */
   fp = fopen (seq_file, "r");
-
   while ( fgets (mystring , sizeof mystring , fp) ){
     if (mystring[0] == '>'){
       count++;
@@ -172,9 +172,13 @@ int main (int argc, char **argv){
   }
   num_seq = count;
   obs_seq_len = (int *)malloc(num_seq * sizeof(int));
+      if (!obs_seq_len) {
+         fprintf(stderr, "%s\n", "ERROR: Allocation failure for obs_seq_len");
+         exit(EXIT_FAILURE);
+         }
   printf("no. of seqs: %d\n", num_seq);
 
-
+  /*  Parse input, count record length, store in obs_seq_len */
   i = 0;
   count = 0;
   rewind(fp);
@@ -196,15 +200,30 @@ int main (int argc, char **argv){
   }
   obs_seq_len[count] = i;
 
+/*  Parse input, read data, store in obs_head and obs_seq fields and call viterbi  */
   count=-1;
   rewind(fp);
   j = 0;
+  obs_head = (char *)malloc(sizeof(mystring));
+      if (!obs_head) {
+         fprintf(stderr, "%s\n", "ERROR: Allocation failure for obs_head");
+         exit(EXIT_FAILURE);
+         }
+  memset(obs_head, 0, (bp_count+1) * sizeof(char));
+  obs_seq = (char *)malloc(obs_seq_len[0] * sizeof(char) + 1);
+      if (!obs_seq) {
+         fprintf(stderr, "%s\n", "ERROR: Allocation failure for obs_seq");
+         exit(EXIT_FAILURE);
+         }
 
   while ( fgets (mystring , sizeof mystring  , fp) ){
 
     if (mystring[0] == '>'){
-
-      if (count>=0 && j>0){
+         if(strlen(mystring) == (sizeof mystring) -1) {
+           fprintf(stderr, "ERROR: FASTA header too long!  %d bytes\n", (int)strlen(mystring));
+           exit(EXIT_FAILURE);
+           }
+      if (count>=0 && j>0){  // process previous sequence
 
  	get_prob_from_cg(&hmm, &train, obs_seq);
 
@@ -213,23 +232,25 @@ int main (int argc, char **argv){
 	}
       }
 
-      bp_count = strlen(mystring)-1;
+      bp_count = strlen(mystring)-1;   // handle fasta header 
       while(mystring[bp_count-1] == 10 || mystring[bp_count-1]==13){
 	bp_count --;
       }
-
-      obs_head = (char *)malloc((bp_count+1) * sizeof(char));
       memset(obs_head, 0, (bp_count+1) * sizeof(char));
       memcpy(obs_head, mystring, bp_count);
 
-      if (count== -1 || (count>=0 && j>0)){
+      if (count == -1 || (count>=0 && j>0) ){   // allocate and initially populate obs_seq
 	count++;
 	obs_seq = (char *)malloc(obs_seq_len[count] * sizeof(char) + 1);
+       if (!obs_seq) {
+          fprintf(stderr, "%s\n", "ERROR: Allocation failure for obs_seq");
+          exit(EXIT_FAILURE);
+          }
 	memset(obs_seq, 0, obs_seq_len[count] * sizeof(char) + 1);
       }
       j = 0;
 
-    }else{
+    }else{                                     // append to obs_seq
       bp_count = strlen(mystring)-1;
       while(mystring[bp_count-1] == 10 || mystring[bp_count-1]==13){
 	bp_count --;
@@ -239,7 +260,7 @@ int main (int argc, char **argv){
     }
   }
 
-  if (count>=0){
+  if (count>=0){                              // take care of final sequence
 
     get_prob_from_cg(&hmm, &train, obs_seq);
 
@@ -250,6 +271,7 @@ int main (int argc, char **argv){
   
   free(obs_seq_len);
   free(obs_head);
+  free(obs_seq);
   fclose(fp_out);
   fclose(fp_aa);
   fclose(fp_dna);
