@@ -163,10 +163,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 
       if (alpha[i][t]<max_dbl){
 
-	if (t==0){
-
-	}else{
-	  
+	if (t>0){
 	  if (i==M1_STATE){  
 	    
 	    /* from M state */
@@ -267,9 +264,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
     /******************/
     for (i=I1_STATE; i<=I6_STATE; i++) {   
 
-      if (t==0){
-      }else{
-      
+      if (t>0){
 	/* from I state */
 	j = i;                                                                       
 	alpha[i][t] = alpha[j][t-1] - log(hmm_ptr->tr[TR_II]) - log(hmm_ptr->tr_I_I[from][to]);  
@@ -308,9 +303,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 
       }else{
 	
-	if (t==0){
-	}else{
-
+	if (t>0){
 	  if (i==M1_STATE_1 ){
 
 	    /* from M state */
@@ -410,8 +403,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
     /******************/
     for (i=I1_STATE_1; i<=I6_STATE_1; i++) {                                            
 
-      if (t==0){
-      }else{
+      if (t>0){
 	/* from I state */
 	j = i;                                                                       
 	alpha[i][t] = alpha[j][t-1] - log(hmm_ptr->tr[TR_II]) - log(hmm_ptr->tr_I_I[from][to]);  
@@ -439,8 +431,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
     /* Non_coding state    */ 
     /***********************/
 
-    if (t==0){
-    }else{
+    if (t>0){
       alpha[R_STATE][t] = alpha[R_STATE][t-1] - log(hmm_ptr->tr_R_R[from][to]) -  log(hmm_ptr->tr[TR_RR]);   
       path[R_STATE][t] = R_STATE;    
       
