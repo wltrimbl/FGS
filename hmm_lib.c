@@ -1073,7 +1073,7 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mf
   /****************************************************/
   /* stop                                             */
   /****************************************************/
-  fpp = fopen (sfilename, "r");
+  fpp = fopen (pfilename, "r");
   for (p=0; p<44; p++){
     fscanf(fpp, "%s", head);
     for (j=0; j<58; j++){
