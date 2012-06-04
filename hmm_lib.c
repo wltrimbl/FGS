@@ -500,11 +500,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	alpha[M1_STATE][t] = max_dbl;
 
 	if ((O[t+1] == 'A'||O[t+1] =='a') && (O[t+2] == 'A'||O[t+2] =='a')){
-	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(0.54);
+	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(p_TAA);
 	}else if ((O[t+1] == 'A'||O[t+1] =='a') && (O[t+2] == 'G'||O[t+2] =='g')){
-	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(0.16);
+	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(p_TAG);
 	}else if((O[t+1] == 'G'||O[t+1] == 'g') && (O[t+2] == 'A'||O[t+2] =='a')) {
-	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(0.30);
+	  alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(p_TGA);
 	}
 
 	/* adjustment based on probability distribution */
@@ -565,11 +565,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
         alpha[M6_STATE_1][t+2] = max_dbl;
 
 	if ((O[t] == 'T'||O[t] == 't') && (O[t+1] == 'T'||O[t+1] == 't')){
-	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(0.54);
+	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(p_TAA);
 	}else if ((O[t] == 'C'||O[t] =='c') && (O[t+1] == 'T'||O[t+1]=='t')){
-	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(0.16);
+	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(p_TAG);
 	}else if((O[t] == 'T'||O[t] =='t') && (O[t+1] == 'C'||O[t+1] =='c')){
-	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(0.30);
+	  alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(p_TGA);
 	}
 
 	/* adjustment based on probability distribution */
@@ -624,11 +624,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 
 	
 	if ((O[t] == 'A'||O[t] =='a') ){
-	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(0.83);
+	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(p_ATG);
 	}else if ((O[t] == 'G'||O[t] =='g')){
-	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(0.10);
+	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(p_GTG);
 	}else if((O[t] == 'T'||O[t] == 't')) {
-	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(0.07);
+	  alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(p_TTG);
 	}
 
 	/* adjustment based on probability distribution */
@@ -673,11 +673,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	path[E_STATE_1][t+2] = E_STATE_1;
 	
 	if ((O[t+2] == 'T'||O[t+2] == 't') ){
-	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(0.83);
+	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(p_ATG);
 	}else if ((O[t+2] == 'C'||O[t+2] =='c') ){
-	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(0.10);
+	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(p_GTG);
 	}else if((O[t+2] == 'A'||O[t+2] =='a') ){
-	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(0.07);
+	  alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(p_TTG);
 	}
 
 	/* adjustment based on probability distribution */
