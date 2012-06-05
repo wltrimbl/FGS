@@ -64,6 +64,9 @@
 #define p_TAG .16
 #define p_TGA .30 
 
+#define USE_START 1
+#define USE_STOP  1
+
 typedef struct {
 
   double  pi[29];    /* pi[1..N] pi[i] is the initial state distribution. */

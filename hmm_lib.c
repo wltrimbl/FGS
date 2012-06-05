@@ -522,8 +522,8 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	  p_kd=0.01;
 	}else if (p_kd>0.99){
 	  p_kd=0.99;
-	}
-	alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(p_kd);
+	}  
+        if(USE_STOP){ alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - log(p_kd);}
       }      
     }
 
@@ -588,7 +588,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	}else if (p_kd>0.99){
 	  p_kd=0.99;
 	}
-	alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(p_kd);
+	if(USE_STOP){alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - log(p_kd);}
       }
     }
     
@@ -647,7 +647,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	}else if (p_kd>0.99){
 	  p_kd=0.99;
 	}
-	alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(p_kd);
+	if(USE_START){alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - log(p_kd);}
 
       }
     }
@@ -697,7 +697,7 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	}else if (p_kd>0.99){
 	  p_kd=0.99;
 	}
-	alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(p_kd);
+	if(USE_START){alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - log(p_kd);}
       }
     }
     if (num_N>9){
