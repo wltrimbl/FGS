@@ -1067,7 +1067,7 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mf
   fpp = fopen (pfilename, "r");
   for (p=0; p<44; p++){
     fscanf(fpp, "%s", head);
-    for (j=0; j<58; j++){
+    for (j=0; j<61; j++){
       for (k=0; k<64; k++){
 	fscanf(fpp, "%lf", &prob);
 	train_ptr->stop[p][j][k] = prob;	
@@ -1083,7 +1083,7 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mf
   fps1 = fopen (s1filename, "r");
   for (p=0; p<44; p++){
     fscanf(fps1, "%s", head);
-    for (j=0; j<58; j++){
+    for (j=0; j<61; j++){
       for (k=0; k<64; k++){
 	fscanf(fps1, "%lf", &prob);
 	train_ptr->start1[p][j][k] = prob;	
