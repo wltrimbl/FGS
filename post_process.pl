@@ -50,6 +50,10 @@ while(my $each_line=<IN>){
     
     if ($each_line=~/^\>(\S+)/){
 	$h = $1;
+        if (exists $s{$h}){
+            die "Duplicate sequence head name: ".$h.", $program exited. Please verify the correctness of input sequences.\n";
+        }
+
     }else{
 	$s{$h} .= $each_line;
     }
