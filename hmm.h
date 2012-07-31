@@ -56,9 +56,9 @@
 #define TR_ES 12
 #define TR_ES1 13
 
-#define p_ATG .83
-#define p_GTG .10
-#define p_TTG .07 
+#define p_ATG 1 // .83
+#define p_GTG 1 // .10
+#define p_TTG 1 // .07 
 
 #define p_TAA .54
 #define p_TAG .16
