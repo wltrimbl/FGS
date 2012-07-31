@@ -11,7 +11,7 @@ my $debug=1;
 my $program = $0;
 my $dir = substr($0, 0, length($0)-19);
 my $train_file;
-
+my $LOGFILE;
 
 GetOptions(
            'genome=s' => \$genome_file,
@@ -53,26 +53,27 @@ if (length($FGS_train_file)==0){
     exit;
 }
 
-
+open $LOGFILE, ">$FGS_result.log";
+print $LOGFILE `date`;
 $command = $dir."FragGeneScan";
 $command .= " -s ".$genome_file;
 $command .= " -o ".$FGS_result;
 $command .= " -w ".$FGS_whole ;
 $command .= " -t ".$FGS_train_file;
-if($debug){print "$command\n";}
+print $LOGFILE "$command\n";
 system($command); 
 if($? != 0) {print "ERROR: '$command' return value $?\n"; exit;}
 
 if ($FGS_whole eq "1"){
-    if($debug){print $dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out\n";}
-    system($dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out");
+    print $LOGFILE $dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out\n";
+    system(         $dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out");
     if(!$debug){system("rm ".$FGS_result);}
 
 }else{
-    if($debug){print "mv ".$FGS_result." ".$FGS_result.".out\n";}
+    print $LOGFILE "mv ".$FGS_result." ".$FGS_result.".out\n";
     system("mv ".$FGS_result." ".$FGS_result.".out");
 }
-
+print $LOGFILE `date`;
 
 sub print_usage{
 
