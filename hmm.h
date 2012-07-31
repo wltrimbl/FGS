@@ -60,9 +60,9 @@
 #define p_GTG .10
 #define p_TTG .07 
 
-#define p_TAA 1 // .54
-#define p_TAG 1 // .16
-#define p_TGA 1 // .30 
+#define p_TAA  .54
+#define p_TAG  .16
+#define p_TGA  .30 
 
 #define USE_START 1
 #define USE_STOP  1
