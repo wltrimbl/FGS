@@ -817,8 +817,10 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	  fprintf(fp_out, "\n");
 
 	  fprintf(fp_aa, "%s_%d_%d_+\n", head_short, start_t, end_t);
-	  fprintf(fp_dna, "%s_%d_%d_+\n", head_short, start_t, end_t);
 
+	  if (format!=2) {
+		  fprintf(fp_dna, "%s_%d_%d_+\n", head_short, start_t, end_t);
+	  }
 	  get_protein(dna,protein,1);
 	  fprintf(fp_aa, "%s\n", protein);
 	  if (format==0){
@@ -842,8 +844,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	  fprintf(fp_out, "\n");
 
 	  fprintf(fp_aa, "%s_%d_%d_-\n", head_short, start_t, end_t);
-	  fprintf(fp_dna, "%s_%d_%d_-\n", head_short, start_t, end_t);
 	  
+	  if (format!=2) {
+		  fprintf(fp_dna, "%s_%d_%d_-\n", head_short, start_t, end_t);
+	  }
+
 	  get_protein(dna,protein,-1);
 	  get_rc_dna(dna, dna1);
 	  get_rc_dna_indel(dna_f, dna_f1);

@@ -64,7 +64,7 @@ int main (int argc, char **argv){
     exit(EXIT_FAILURE);
   }
 
-  while ((c=getopt(argc, argv, "fs:o:w:t:")) != -1){
+  while ((c=getopt(argc, argv, "fs:o:w:t:q")) != -1){
 
     switch (c){
     case 's':
@@ -99,6 +99,10 @@ int main (int argc, char **argv){
       break;
     case 'f':
       format = 1;
+      break;
+    case 'q':
+      printf("inhibit .fnn for output");
+      format = 2;
       break;
     }
   }

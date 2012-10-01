@@ -6,6 +6,7 @@ my $genome_file = "";
 my $FGS_result = "";
 my $FGS_whole = -1;
 my $FGS_train_file = "";
+my $Quiet=0;
 my $command;
 my $debug=1;
 my $program = $0;
@@ -18,7 +19,10 @@ GetOptions(
            'out=s' => \$FGS_result,
            'complete=s' => \$FGS_whole,
            'train=s' => \$FGS_train_file,
+           'q' => \$Quiet,
            );
+
+print "$genome_file $FGS_result $FGS_whole $FGS_train_file $Quiet\n";
 
 if (length($genome_file)==0){
     print "ERROR: An input genome file was not specified.\n";
@@ -60,6 +64,11 @@ $command .= " -s ".$genome_file;
 $command .= " -o ".$FGS_result;
 $command .= " -w ".$FGS_whole ;
 $command .= " -t ".$FGS_train_file;
+
+if ($Quiet==1) {
+$command .= " -q"
+}
+
 print $LOGFILE "$command\n";
 system($command); 
 if($? != 0) {print "ERROR: '$command' return value $?\n"; exit;}
