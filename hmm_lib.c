@@ -802,7 +802,9 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
       if (dna_id > gene_len  ){
 
 	if (codon_start==1){
-	  
+
+	  if (format!=2) {
+
 	  fprintf(fp_out, "%d\t%d\t+\t%d\t%lf\t", start_t, end_t, frame, final_score);
 /* 	  printf("mina %d\t%d\t+\t%d\t%lf\t", start_t, end_t, frame, final_score); */
 
@@ -816,11 +818,12 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	  }
 	  fprintf(fp_out, "\n");
 
+	  fprintf(fp_dna, "%s_%d_%d_+\n", head_short, start_t, end_t);
+
+	  }
+
 	  fprintf(fp_aa, "%s_%d_%d_+\n", head_short, start_t, end_t);
 
-	  if (format!=2) {
-		  fprintf(fp_dna, "%s_%d_%d_+\n", head_short, start_t, end_t);
-	  }
 	  get_protein(dna,protein,1);
 	  fprintf(fp_aa, "%s\n", protein);
 	  if (format==0){
@@ -830,6 +833,8 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	  }
 	  
 	}else if (codon_start==-1){
+
+	  if (format!=2) {
 	  
 	  fprintf(fp_out, "%d\t%d\t-\t%d\t%lf\t", start_t, end_t, frame, final_score);
 /* 	  printf("mina %d\t%d\t-\t%d\t%lf\t", start_t, end_t, frame, final_score); */
@@ -842,12 +847,10 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	    fprintf(fp_out, "%d,", delete[i]);
 	  }
 	  fprintf(fp_out, "\n");
+	  fprintf(fp_dna, "%s_%d_%d_-\n", head_short, start_t, end_t);
+	  }
 
 	  fprintf(fp_aa, "%s_%d_%d_-\n", head_short, start_t, end_t);
-	  
-	  if (format!=2) {
-		  fprintf(fp_dna, "%s_%d_%d_-\n", head_short, start_t, end_t);
-	  }
 
 	  get_protein(dna,protein,-1);
 	  get_rc_dna(dna, dna1);
