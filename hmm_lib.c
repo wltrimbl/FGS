@@ -711,10 +711,11 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
   /***********************************************************/
   /* backtrack array to find the optimal path                */
   /***********************************************************/
+  if (format!=2){
+	  fprintf(fp_out, "%s\n", head);
+  }
 
-  fprintf(fp_out, "%s\n", head);
   head_short = strtok(head, delimi);
-
 
   /* find the state for O[N] with the highest probability */
   prob = max_dbl;
