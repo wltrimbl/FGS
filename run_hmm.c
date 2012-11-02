@@ -169,6 +169,9 @@ int main (int argc, char **argv){
 
  /*  Parse input, count records, store in int num_seq */
   fp = fopen (seq_file, "r");
+  fgets(mystring, 2, fp);
+  if ( ( mystring[0] != '>')) {fprintf(stderr, "Input data '%s' not in fasta format \n", seq_file); exit(EXIT_FAILURE);}
+  rewind(fp);
   while ( fgets (mystring , sizeof mystring , fp) ){
     if (mystring[0] == '>'){
       count++;
