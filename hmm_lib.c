@@ -16,7 +16,7 @@
 void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, char *head, int whole_genome, int format){
 
   double max_dbl = 10000000000.0;
-  int debug=0;   
+ // int debug=0;   
 
   int *vpath;                          /* optimal path after backtracking */
   double **alpha;                      /* viterbi prob array */
