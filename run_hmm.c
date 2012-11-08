@@ -75,7 +75,7 @@ int main (int argc, char **argv){
 		switch (c){
 		case 's':
 			strcpy(seq_file, optarg);
-			if (strcmp(seq_file, "stdin") != 0 ) {	
+			if (strcmp(seq_file, "-") != 0 ) {	
 				if (access(seq_file, F_OK)==-1){
 					fprintf(stderr, "ERROR: Sequence file [%s] does not exist\n", seq_file);
 					print_usage();
@@ -176,7 +176,7 @@ int main (int argc, char **argv){
 	if(fp_dna ==0) {fprintf(stderr, "error opening dna file %s\n", dna_file); exit(EXIT_FAILURE);}
 
 	
-	if (strcmp(seq_file, "stdin") == 0 ) {
+	if (strcmp(seq_file, "-") == 0 ) {
 		fp = stdin;
 		
 		mylongbuffer = (char *)malloc(mylongbuffer_len);

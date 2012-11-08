@@ -32,7 +32,7 @@ if (length($genome_file)==0){
     print_usage();
     exit;
 }elsif (! -e $genome_file){
-	if ($genome_file ne "stdin") {
+	if ($genome_file ne "-") {
 		print "ERROR: The input genome file [$genome_file] does not exist.\n";
 		print_usage();
 		exit;
