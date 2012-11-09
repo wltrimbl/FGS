@@ -33,6 +33,7 @@ int main (int argc, char **argv){
 	char p1state_file[4096] = "";
 	char dstate_file[4096] = "";
 	char train_dir[4096] = "";
+	char new_train_dir[4096] = "";
 	int count=0;
 	char mystring[1000] = "";				/* input buffer	*/
 	int mylongbuffer_len = 5000000;
@@ -43,26 +44,6 @@ int main (int argc, char **argv){
 	int *obs_seq_len = 0;
 	int bp_count=0;	/* count the length of each line in input file */
 
-	strncpy(train_dir, argv[0], strlen(argv[0])-12);
-	strcat(train_dir, "train/");
-	strcpy(mstate_file, train_dir);
-	strcat(mstate_file, "gene");
-	strcpy(rstate_file, train_dir);
-	strcat(rstate_file, "rgene");
-	strcpy(nstate_file, train_dir);
-	strcat(nstate_file, "noncoding");
-	strcpy(sstate_file, train_dir);
-	strcat(sstate_file, "start");
-	strcpy(pstate_file, train_dir);
-	strcat(pstate_file, "stop");
-	strcpy(s1state_file, train_dir);
-	strcat(s1state_file, "stop1");
-	strcpy(p1state_file, train_dir);
-	strcat(p1state_file, "start1");
-	strcpy(dstate_file, train_dir);
-	strcat(dstate_file, "pwm");
-
-
 	/* read command line argument */
 	if (argc <= 8){		
 		fprintf(stderr, "ERROR: You missed some parameters for input\n");
@@ -70,8 +51,7 @@ int main (int argc, char **argv){
 		exit(EXIT_FAILURE);
 	}
 
-	while ((c=getopt(argc, argv, "fs:o:w:t:q")) != -1){
-
+	while ((c=getopt(argc, argv, "fs:o:w:t:d:q")) != -1){
 		switch (c){
 		case 's':
 			strcpy(seq_file, optarg);
@@ -96,14 +76,6 @@ int main (int argc, char **argv){
 			break;
 		case 't':
 			strcpy(train_file, optarg);
-			strcpy(hmm_file, train_dir);
-			strcat(hmm_file, train_file);
-
-			if (access(hmm_file, F_OK)==-1){
-				fprintf(stderr, "ERROR: The file for model parameters [%s] does not exist\n", hmm_file);
-				print_usage();
-				exit(EXIT_FAILURE);
-			}
 			break;
 		case 'f':
 			format = 1;
@@ -112,7 +84,46 @@ int main (int argc, char **argv){
 			printf("inhibit .fnn for output");
 			format = 2;
 			break;
+		case 'd':
+			strcpy(new_train_dir, optarg);
+			break;
 		}
+	}
+
+	if (strlen(new_train_dir) == 0) {
+		strncpy(train_dir, argv[0], strlen(argv[0])-12);
+		strcat(train_dir, "train/");
+	} else {
+		strcpy(train_dir, new_train_dir);
+		strcat(train_dir, "/");
+	}
+
+	printf("train_dir=%s\n", train_dir);
+
+	strcpy(hmm_file, train_dir);
+	strcat(hmm_file, train_file);
+
+	strcpy(mstate_file, train_dir);
+	strcat(mstate_file, "gene");
+	strcpy(rstate_file, train_dir);
+	strcat(rstate_file, "rgene");
+	strcpy(nstate_file, train_dir);
+	strcat(nstate_file, "noncoding");
+	strcpy(sstate_file, train_dir);
+	strcat(sstate_file, "start");
+	strcpy(pstate_file, train_dir);
+	strcat(pstate_file, "stop");
+	strcpy(s1state_file, train_dir);
+	strcat(s1state_file, "stop1");
+	strcpy(p1state_file, train_dir);
+	strcat(p1state_file, "start1");
+	strcpy(dstate_file, train_dir);
+	strcat(dstate_file, "pwm");
+
+	if (access(hmm_file, F_OK)==-1){
+		fprintf(stderr, "ERROR: The file for model parameters [%s] does not exist\n", hmm_file);
+		print_usage();
+		exit(EXIT_FAILURE);
 	}
 
 	
