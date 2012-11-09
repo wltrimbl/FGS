@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 use Getopt::Long;
+use FindBin;
 
 my $genome_file = "";
 my $FGS_result = "";
@@ -9,8 +10,10 @@ my $FGS_train_file = "";
 my $Quiet=0;
 my $command;
 my $debug=1;
-my $program = $0;
-my $dir = substr($0, 0, length($0)-19);
+#my $program = $0;
+#my $dir = substr($0, 0, length($0)-19);
+my $dir = $FindBin::Bin."/";
+
 my $train_file;
 my $LOGFILE;
 
@@ -29,9 +32,11 @@ if (length($genome_file)==0){
     print_usage();
     exit;
 }elsif (! -e $genome_file){
-    print "ERROR: The input genome file [$genome_file] does not exist.\n";
-    print_usage();
-    exit;
+	if ($genome_file ne "-") {
+		print "ERROR: The input genome file [$genome_file] does not exist.\n";
+		print_usage();
+		exit;
+	}
 }
 
 if (length($FGS_result) == 0 ){
@@ -70,14 +75,28 @@ $command .= " -q"
 }
 
 print $LOGFILE "$command\n";
-system($command); 
-if($? != 0) {print "ERROR: '$command' return value $?\n"; exit;}
+
+if ($genome_file eq "stdin") {
+	open(FGS_PIPE, "|$command ") # $$ is our process id
+	or die "Can't start FGS: $!";
+	
+	while (<STDIN>) {
+		print FGS_PIPE $_;
+	}
+	
+} else {
+	system($command); 
+	if($? != 0) {print "ERROR: '$command' return value $?\n"; exit;}
+}
+
+
 
 if ($FGS_whole eq "1"){
-    print $LOGFILE $dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out\n";
-    system(         $dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out");
-    if(!$debug){system("rm ".$FGS_result);}
-
+	if ($genome_file ne "stdin") {
+		print $LOGFILE $dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out\n";
+		system($dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out");
+		if(!$debug){system("rm ".$FGS_result);}
+	}
 }else{
     print $LOGFILE "mv ".$FGS_result." ".$FGS_result.".out\n";
     system("mv ".$FGS_result." ".$FGS_result.".out");
