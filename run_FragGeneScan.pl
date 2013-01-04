@@ -33,31 +33,31 @@ print "$genome_file $FGS_result $FGS_whole $FGS_train_file $Quiet\n";
 if (length($genome_file)==0){
     print "ERROR: An input genome file was not specified.\n";
     print_usage();
-    exit;
+    exit __LINE__;
 }elsif (! -e $genome_file){
 	if ($genome_file ne "-") {
 		print "ERROR: The input genome file [$genome_file] does not exist.\n";
 		print_usage();
-		exit;
+		exit __LINE__;   #use line number as exit code
 	}
 }
 
 if (length($FGS_result) == 0 ){
     print "ERROR: An output file name was not specified.\n";
     print_usage();
-    exit;
+    exit __LINE__;
 }
 
 unless ($FGS_whole eq "1" || $FGS_whole eq "0"){
     print "ERROR: An incorrect value for the option -complete was entered.\n";
     print_usage();
-    exit;
+    exit __LINE__;
 }  
 
 if (length($FGS_train_file)==0){
     print  "ERROR: A file for model parameters was not specified.\n";
     print_usage();
-    exit;
+    exit __LINE__;
 }
 
 if (length($FGS_train_dir)==0) {
@@ -70,7 +70,7 @@ if (length($FGS_train_dir)==0) {
 if (! -e $train_file){
     print  "ERROR: The file for model parameter [$train_file] does not exist.\n";
     print_usage();
-    exit;
+    exit __LINE__;
 }
 
 open $LOGFILE, ">$FGS_result.log";
@@ -101,7 +101,7 @@ if ($genome_file eq "stdin") {
 	
 } else {
 	system($command); 
-	if($? != 0) {print "ERROR: '$command' return value $?\n"; exit;}
+	if($? != 0) {print "ERROR: '$command' return value $?\n"; exit $?;}
 }
 
 
