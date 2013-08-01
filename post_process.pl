@@ -67,7 +67,6 @@ while(my $each_line=<SEQ>){
     if ($each_line=~/^\>(\S+)/){
 	
 	if (length($seq)>0){
-	    
 	    if (exists $s{$head}){
 		print OUT ">".$head."\n";
 		call_post(\$seq, \*OUT, \$s{$head},\@lines, \@lines1);
@@ -79,8 +78,12 @@ while(my $each_line=<SEQ>){
 	$seq .= $each_line;
     }
 }
-print OUT ">".$head."\n";
-call_post(\$seq, \*OUT, \$s{$head},\@lines, \@lines1);
+if (length($seq)>0){ #added by YY, Aug, 2013
+    if (exists $s{$head}){
+	print OUT ">".$head."\n";
+	call_post(\$seq, \*OUT, \$s{$head},\@lines, \@lines1);
+    }
+}
 
 close(OUT);
 close(SEQ);
