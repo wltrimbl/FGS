@@ -68,6 +68,8 @@ if ($FGS_whole eq "1"){
     system("mv ".$FGS_result." ".$FGS_result.".out");
 }
 
+system($dir."FGS_gff.py ".$FGS_result.".out ".$FGS_result.".gff");
+
 
 sub print_usage{
 
