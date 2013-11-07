@@ -167,6 +167,11 @@ int main (int argc, char **argv){
   }
   num_seq = count;
   obs_seq_len = (int *)malloc(num_seq * sizeof(int));
+  if (!obs_seq_len) {
+    fprintf(stderr, "%s\n", "ERROR: Allocation failure for obs_seq_len");
+    exit(EXIT_FAILURE);
+  }
+
   printf("no. of seqs: %d\n", num_seq);
 
 
@@ -193,7 +198,7 @@ int main (int argc, char **argv){
 
   count=-1;
   rewind(fp);
-  j ==0;
+  j = 0;
 
   while ( fgets (mystring , sizeof mystring  , fp) ){
 
@@ -214,12 +219,22 @@ int main (int argc, char **argv){
       }
 
       obs_head = (char *)malloc((bp_count+1) * sizeof(char));
+  if (!obs_head) {
+    fprintf(stderr, "%s\n", "ERROR: Allocation failure for obs_head");
+    exit(EXIT_FAILURE);
+  }
+
       memset(obs_head, 0, (bp_count+1) * sizeof(char));
       memcpy(obs_head, mystring, bp_count);
 
       if (count== -1 || (count>=0 && j>0)){
 	count++;
 	obs_seq = (char *)malloc(obs_seq_len[count] * sizeof(char) + 1);
+  if (!obs_seq) {
+    fprintf(stderr, "%s\n", "ERROR: Allocation failure for obs_seq");
+    exit(EXIT_FAILURE);
+  }
+
 	memset(obs_seq, 0, obs_seq_len[count] * sizeof(char) + 1);
       }
       j = 0;
@@ -249,6 +264,7 @@ int main (int argc, char **argv){
   fclose(fp_aa);
   fclose(fp_dna);
   fclose(fp);
+  return(0);
 }
 
 

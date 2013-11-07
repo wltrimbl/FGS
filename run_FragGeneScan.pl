@@ -59,6 +59,7 @@ $command .= " -o ".$FGS_result;
 $command .= " -w ".$FGS_whole ;
 $command .= " -t ".$FGS_train_file;
 system($command); 
+if($? != 0) {print "ERROR: '$command' return value $?\n"; exit;}
 
 if ($FGS_whole eq "1"){
     system($dir."post_process.pl -genome=".$genome_file." -pre=".$FGS_result." -post=".$FGS_result.".out");
