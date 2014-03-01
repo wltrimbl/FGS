@@ -16,7 +16,7 @@
 void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, char *head, int whole_genome, int format){
 
   double max_dbl = 10000000000.0;
-  int debug=0;   
+  int debug=1;
 
   int *vpath;                          /* optimal path after backtracking */
   double **alpha;                      /* viterbi prob array */
@@ -700,12 +700,13 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
 	}
       }
     }
-/*     printf("%d(%c)\t", t,O[t] ); */
-/*     for (i = 0; i < hmm_ptr->N; i++){ */
-/*       printf("%lf(%d %d)\t", alpha[i][t],path[i][t], i); */
+    if( len_seq - t < 10000) {
+     printf("%d(%c)\t", t,O[t] );
+     for (i = 0; i < hmm_ptr->N; i++){
+       printf("%lf(%d %d)\t", alpha[i][t],path[i][t], i);
       
-/*     } */
-/*     printf("\n\n"); */
+     }
+     printf("\n");  }
   }
 
   /***********************************************************/
@@ -724,14 +725,14 @@ void viterbi(HMM *hmm_ptr, char *O, FILE *fp_out, FILE *fp_aa, FILE *fp_dna, cha
     if (alpha[i][len_seq-1] < prob){
       prob = alpha[i][len_seq-1];
       vpath[len_seq-1] = i;
-/*       printf("%lf, %d\n", prob, vpath[len_seq-1]); */
+       printf("%lf, %d\n", prob, vpath[len_seq-1]);
     }
   }
 
   /* backtrack the opitmal path */
   for(t=len_seq-2; t>=0; t--){
     vpath[t] = path[vpath[t+1]][t+1];
-/*     printf("%d %d %c  \n",t, vpath[t], O[t]); */
+     /* printf("%d %d %c  \n",t, vpath[t], O[t]);  */
   }
 
   codon_start=0;
@@ -939,6 +940,7 @@ void get_prob_from_cg(HMM *hmm_ptr, TRAIN *train_ptr, char *O){
    }else if (cg_count > 43){
      cg_count = 43;
    }
+  if(1) { printf("CG: %d\n", cg_count+26);}
 
   memcpy(hmm_ptr->e_M, train_ptr->trans[cg_count], sizeof(hmm_ptr->e_M)); 
   memcpy(hmm_ptr->e_M_1, train_ptr->rtrans[cg_count], sizeof(hmm_ptr->e_M_1)); 
