@@ -481,8 +481,7 @@ log(hmm_ptr->tr[TR_MI]) -log(hmm_ptr->tr_M_I[from][to]);
 
     if (t==0){
     }else{
-      alpha[R_STATE][t] = alpha[R_STATE][t-1] -
-log(hmm_ptr->tr_R_R[from][to]) -  log(hmm_ptr->tr[TR_RR]);
+      alpha[R_STATE][t] = alpha[R_STATE][t-1] - log(hmm_ptr->tr_R_R[from][to]) -  log(hmm_ptr->tr[TR_RR]);
       path[R_STATE][t] = R_STATE;
 
       temp_alpha = alpha[E_STATE][t-1]  - log(hmm_ptr->tr[TR_ER])  ;
@@ -562,22 +561,18 @@ log(hmm_ptr->tr_R_R[from][to]) -  log(hmm_ptr->tr[TR_RR]);
 
         if (t>=60){ /* bug reported by Yu-Wei */
                 for(i=-60; i<=-3; i++){
-                        start_freq -=
-log(hmm_ptr->tr_E[i+60][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+                        start_freq -= log(hmm_ptr->tr_E[i+60][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
                 }
         }else{
                 for(i=(-1*t); i<=-3; i++){
-                        sub_sum +=
-log(hmm_ptr->tr_E[i+60][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+                        sub_sum += log(hmm_ptr->tr_E[i+60][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
                 }
                 sub_sum = sub_sum * 58 / (-3 + t + 1);
                 start_freq -= sub_sum;
         }
 
-	h_kd = hmm_ptr->E_dist[2] *
-exp(-1*pow(start_freq-hmm_ptr->E_dist[1],2)/(2*pow(hmm_ptr->E_dist[0],2)));
-	r_kd = hmm_ptr->E_dist[5] *
-exp(-1*pow(start_freq-hmm_ptr->E_dist[4],2)/(2*pow(hmm_ptr->E_dist[3],2)));
+	h_kd = hmm_ptr->E_dist[2] * exp(-1*pow(start_freq-hmm_ptr->E_dist[1],2)/(2*pow(hmm_ptr->E_dist[0],2)));
+	r_kd = hmm_ptr->E_dist[5] * exp(-1*pow(start_freq-hmm_ptr->E_dist[4],2)/(2*pow(hmm_ptr->E_dist[3],2)));
 	p_kd = h_kd / (h_kd + r_kd);
 	if (p_kd<0.01){
 	  p_kd=0.01;
@@ -637,15 +632,10 @@ exp(-1*pow(start_freq-hmm_ptr->E_dist[4],2)/(2*pow(hmm_ptr->E_dist[3],2)));
 	start_freq=0;
 	freq_id = 0;
 	for(i=3; i<=60; i++){
-	  start_freq -= log(hmm_ptr->tr_S_1[i-3][trinucleotide(O[t+i], O[t+i+1],
-O[t+i+2])]);
+	  start_freq -= log(hmm_ptr->tr_S_1[i-3][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
 	}
-	h_kd = hmm_ptr->S1_dist[2] *
-exp(-1*pow(start_freq-hmm_ptr->S1_dist[1],2)/(2*pow(hmm_ptr->S1_dist[0],2)))
-;
-	r_kd = hmm_ptr->S1_dist[5] *
-exp(-1*pow(start_freq-hmm_ptr->S1_dist[4],2)/(2*pow(hmm_ptr->S1_dist[3],2)))
-;
+	h_kd = hmm_ptr->S1_dist[2] * exp(-1*pow(start_freq-hmm_ptr->S1_dist[1],2)/(2*pow(hmm_ptr->S1_dist[0],2)));
+	r_kd = hmm_ptr->S1_dist[5] * exp(-1*pow(start_freq-hmm_ptr->S1_dist[4],2)/(2*pow(hmm_ptr->S1_dist[3],2)));
 	p_kd = h_kd / (h_kd + r_kd);
 	if (p_kd<0.01){
 	  p_kd=0.01;
@@ -711,22 +701,18 @@ exp(-1*pow(start_freq-hmm_ptr->S1_dist[4],2)/(2*pow(hmm_ptr->S1_dist[3],2)))
 
         if (t>=30){
                 for(i=-30; i<=30; i++){
-			start_freq -= log(hmm_ptr->tr_S[i+30][trinucleotide(O[t+i], O[t+i+1],
-O[t+i+2])]);
+			start_freq -= log(hmm_ptr->tr_S[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
                 }
         }else{
                 for(i=(-1*t); i<=30; i++){
-			sub_sum += log(hmm_ptr->tr_S[i+30][trinucleotide(O[t+i], O[t+i+1],
-O[t+i+2])]);
+			sub_sum += log(hmm_ptr->tr_S[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
                 }
                 sub_sum = sub_sum * 61 / (30 + t + 1);
                 start_freq -= sub_sum;
         }
 
-	h_kd = hmm_ptr->S_dist[2] *
-exp(-1*pow(start_freq-hmm_ptr->S_dist[1],2)/(2*pow(hmm_ptr->S_dist[0],2)));
-	r_kd = hmm_ptr->S_dist[5] *
-exp(-1*pow(start_freq-hmm_ptr->S_dist[4],2)/(2*pow(hmm_ptr->S_dist[3],2)));
+	h_kd = hmm_ptr->S_dist[2] * exp(-1*pow(start_freq-hmm_ptr->S_dist[1],2)/(2*pow(hmm_ptr->S_dist[0],2)));
+	r_kd = hmm_ptr->S_dist[5] * exp(-1*pow(start_freq-hmm_ptr->S_dist[4],2)/(2*pow(hmm_ptr->S_dist[3],2)));
 	p_kd = h_kd / (h_kd + r_kd);
 	if (p_kd<0.01){
 	  p_kd=0.01;
@@ -771,10 +757,28 @@ exp(-1*pow(start_freq-hmm_ptr->S_dist[4],2)/(2*pow(hmm_ptr->S_dist[3],2)));
 	/* adjustment based on probability distribution */
 	start_freq=0;
 	freq_id = 0;
+	/*
 	for(i=-30; i<=30; i++){
-	  start_freq -= log(hmm_ptr->tr_E_1[i+30][trinucleotide(O[t+i], O[t+i+1],
-O[t+i+2])]);
+	  start_freq -= log(hmm_ptr->tr_E_1[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+
 	}
+	*/
+
+        double sub_sum = 0;
+        int sub_count = 0;
+
+        if (t>=30){
+                for(i=-30; i<=30; i++){
+			start_freq -= log(hmm_ptr->tr_E_1[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+                }
+        }else{
+                for(i=(-1*t); i<=30; i++){
+			sub_sum += log(hmm_ptr->tr_E_1[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+                }
+                sub_sum = sub_sum * 61 / (30 + t + 1);
+                start_freq -= sub_sum;
+        }
+
 	h_kd = hmm_ptr->E1_dist[2] *
 exp(-1*pow(start_freq-hmm_ptr->E1_dist[1],2)/(2*pow(hmm_ptr->E1_dist[0],2)))
 ;
